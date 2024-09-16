@@ -1,5 +1,6 @@
 package edu.mv.controller;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -15,7 +16,9 @@ import edu.mv.service.RocketService;
 @RequestMapping("/")
 public class RocketController {
 
+    @Autowired
     private RocketService rocketService;
+
 
     public RocketController(RocketService rocketService) {
         this.rocketService = rocketService;
@@ -24,7 +27,7 @@ public class RocketController {
     @GetMapping("/rocket/{rocketid}")
     public RocketDTO getRocket(@PathVariable(value = "rocketid") final String id) throws GetRocketException {
         try {
-            return rocketService.getRocket(Integer.valueOf(id));
+            return rocketService.getRocket(Integer.parseInt(id));
         } catch (RocketNotFoundException e) {
             throw new GetRocketException();
         }
