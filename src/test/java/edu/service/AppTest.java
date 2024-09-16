@@ -1,4 +1,4 @@
-package edu.mv;
+package edu.service;
 
 import junit.framework.Test;
 import junit.framework.TestCase;

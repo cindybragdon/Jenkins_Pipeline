@@ -18,6 +18,7 @@ public class PersistenceService {
 
     public RocketDTO retrieve(int id) throws RocketNotFoundException {
         Optional<Rocket> rocketOptional = rocketRepository.findById(id);
+        System.out.println(rocketOptional.toString());
         if (rocketOptional.isPresent()) {
             return convertToRocketDTO(rocketOptional.get());
         }
