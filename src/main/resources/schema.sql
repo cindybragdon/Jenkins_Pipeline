@@ -2,7 +2,6 @@ DROP SCHEMA if exists ro;
 
 CREATE SCHEMA ro;
 
-use ro;
 
 CREATE TABLE rocket (
     id INT PRIMARY KEY,
@@ -11,6 +10,6 @@ CREATE TABLE rocket (
 );
 
 
-INSERT INTO rocket (id, name, sorte) 
+INSERT INTO rocket (id, name, sorte)
 VALUES (1, 'fusee1', 'fusee'), 
 (2, 'balai', 'balai');

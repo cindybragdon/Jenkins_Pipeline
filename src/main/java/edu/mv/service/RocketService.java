@@ -9,15 +9,17 @@ import edu.mv.persistence.RocketNotFoundException;
 
 @Service
 public class RocketService {
+    private PersistenceService persistenceService;
 
-    @Autowired
-    PersistenceService persistenceService;
-
-    public void putRocket(RocketDTO Rocket) {
-        persistenceService.save(Rocket);
+    public RocketService(PersistenceService persistenceService) {
+        this.persistenceService = persistenceService;
     }
 
     public RocketDTO getRocket(int id) throws RocketNotFoundException {
         return persistenceService.retrieve(id);
+    }
+
+    public void putRocket(RocketDTO rocketDTO) {
+        persistenceService.save(rocketDTO);
     }
 }
