@@ -13,7 +13,7 @@ Pour partir Spring Boot:
 
 <!-- TABLE OF CONTENTS -->
 <details>
-  <summary>Table of Contents</summary>
+  <summary>Table des matières</summary>
   <ol>
     <li>
       <a href="#à-propos-du-projet">À propos du projet</a>
