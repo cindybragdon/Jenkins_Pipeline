@@ -56,6 +56,7 @@ pipeline {
                 sh "docker push ${NEXUS_1}/edu.mv/cls515-labmaven-eq19:${VERSION}"
             }
         }
+}
 
     }
 }
