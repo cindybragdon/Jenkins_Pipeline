@@ -14,24 +14,48 @@ pipeline {
                 sh 'mvn clean'
             }
         }
-        stage('deploy') {
-            steps {
-                sh 'mvn clean deploy -s ./settings.xml'
-            }
-        }
+
+        stages {
+                stage('compile') {
+                    steps {
+                        sh 'mvn compile'
+                    }
+                }
+
+
+        stage('build') {
+                    steps {
+                        sh "mvn install"
+                    }
+                }
+
+        stage('test') {
+                    steps {
+                        sh 'mvn test'
+                    }
+                }
+
+
+        stage('package') {
+                   steps {
+                       sh 'mvn package'
+                   }
+               }
 
         stage('docker build') {
             steps {
-                echo 'Building Image ...'
-                sh "docker build . -t 172.16.189.130:8082/edu.mv/maintenance:latest"
+                echo 'Building Image edu.mv/cls515-labmaven-eq19'
+                sh "docker build . -t ${NEXUS_1}/edu.mv/cls515-labmaven-eq19:${VERSION}"
             }
         }
 
-        stage('push image')
+        stage('push image to Nexus') {
             steps {
-                sh "docker login -u deploy-user --password todopass 172.16.189.128:8081"
-                sh "docker push dlegare/maintenance"
+                echo 'Publication de Image sur Nexus ${NEXUS_1}'
+                sh "echo ${NEXUS_DOCKER_PASSWORD} | docker login ${NEXUS_1} --username ${NEXUS_DOCKER_USERNAME} --password-stdin"
+                sh "docker push ${NEXUS_1}/edu.mv/cls515-labmaven-eq19:${VERSION}"
             }
         }
+
     }
 }
