@@ -15,32 +15,32 @@ pipeline {
             }
         }
 
-        stages {
-                stage('compile') {
-                    steps {
-                        sh 'mvn compile'
-                    }
-                }
+
+        stage('compile') {
+            steps {
+                sh 'mvn compile'
+            }
+        }
 
 
         stage('build') {
-                    steps {
-                        sh "mvn install"
-                    }
-                }
+            steps {
+                sh "mvn install"
+            }
+        }
 
         stage('test') {
-                    steps {
-                        sh 'mvn test'
-                    }
-                }
+            steps {
+                sh 'mvn test'
+            }
+        }
 
 
         stage('package') {
-                   steps {
-                       sh 'mvn package'
-                   }
+               steps {
+                   sh 'mvn package'
                }
+        }
 
         stage('docker build') {
             steps {
@@ -56,7 +56,6 @@ pipeline {
                 sh "docker push ${NEXUS_1}/edu.mv/cls515-labmaven-eq19:${VERSION}"
             }
         }
-}
 
     }
 }
