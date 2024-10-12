@@ -1,3 +1,4 @@
+<a name="readme-top"></a>
 <h2 align="center">Laboratoires, cours Maintenance de Logiciels</h2>
 <h3 align="center">Remis à l'enseignant, monsieur Dominic Légaré</h3>
 <h3 align="center">Réalisé par : Cindy Bragdon https://github.com/cindybragdon</h3>
@@ -16,7 +17,7 @@
  
 
 ---
-
+<a name="maven-top"></a>
 <!-- LABORATOIRE MAVEN PROJET INITIAL-->
 <h2 align="center">Laboratoire Maven Projet Initial</h2>
 
@@ -74,13 +75,15 @@ Webflux (optionel)
 Fixer le bug sur la compilation et exécution avec succès sur 2 requêtes GET et POST après le fix.
 
 1. GET /rocket/{rocketid}
-   ![image](https://github.com/user-attachments/assets/a8445f24-68d4-4444-bb4b-a41a76c248dc)
+   ![image](https://github.com/user-attachments/assets/7e9ed283-6abc-46bc-8f48-70fedc63657b)
+
 
 2. POST /rocket
-    ![image](https://github.com/user-attachments/assets/b415b5dc-123b-4e68-a0ce-16b85456c030)
+    ![image](https://github.com/user-attachments/assets/238c3aa1-f898-4371-a35a-3745c69cdc2a)
 
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+<p align="right">(<a href="#maven-top">Retour au debut de Maven</a>)</p>
 
 
 
@@ -96,11 +99,11 @@ Ajout de couverture de tests unitaires pour le code actuel.
 
 Chacune des parties prenantes doit participer également aux migrations, fix de bug et à l'utilisation correcte du gitflow
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-
+<p align="right">(<a href="#maven-top">Retour au debut de Maven</a>)</p>
 ---
 ---
+<a name="jenkins-top"></a>
 <!-- LABORATOIRE PIPELINE JENKINS PROJET ACTUEL-->
 <h2 align="center">Laboratoire Pipeline Jenkins Projet Actuel</h2>
 
@@ -136,15 +139,17 @@ Le but de ce laboratoire est d'explorer les liens entre le projet Maven réalis�
 <!-- TECHNOLOGIES UTILISEES -->
 ## Technologies utilisees
 
-- Jenkins
-- Maven
-- Nexus
-- Docker
-- Spring Boot 3.3.3
-- Java 17
-- Intellij
+- ![Java](https://img.shields.io/badge/Java-ED8B00?style=for-the-badge&logo=java&logoColor=white)
+- ![Jacoco](https://img.shields.io/badge/Jacoco-5C2D91?style=for-the-badge&logo=java&logoColor=white)
+- ![Jenkins](https://img.shields.io/badge/Jenkins-2C5263?style=for-the-badge&logo=jenkins&logoColor=white)
+- ![Maven](https://img.shields.io/badge/Maven-C71A36?style=for-the-badge&logo=apache-maven&logoColor=white)
+- ![Spring Boot](https://img.shields.io/badge/Spring%20Boot-6DB33F?style=for-the-badge&logo=spring-boot&logoColor=white)
+- ![IntelliJ IDEA](https://img.shields.io/badge/IntelliJ%20IDEA-000000?style=for-the-badge&logo=intellij-idea&logoColor=white)
+- ![Nexus](https://img.shields.io/badge/Nexus-512888?style=for-the-badge&logo=sonatype-nexus&logoColor=white)
+- ![Docker](https://img.shields.io/badge/Docker-0db7ed?style=for-the-badge&logo=docker&logoColor=white)
 
-<p align="right">(<a href="#table-des-matières">back to top</a>)</p>
+
+<p align="right">(<a href="#jenkins-top">Retour au debut de Jenkins</a>)</p>
 
 ---
 
@@ -168,8 +173,6 @@ Double cliquez sur *index.html* et dans l'onglet de code, choissisez votre navig
 
 Voici la couverture de tests visuellement représentée par Jacoco <br>
 ![image](https://github.com/user-attachments/assets/9668763d-0e71-4c28-99a2-a192e5f766a9)
-
-<p align="right">(<a href="#table-des-matières">back to top</a>)</p>
 
 ---
 
@@ -197,7 +200,9 @@ Ajout d'un mécanisme qui empêche la génération de l'image Docker si la couve
 - `NEXUS_1` (URL du dépôt avec le port)
 - `NEXUS_DOCKER_PASSWORD` (mot de passe Nexus)
 - `NEXUS_DOCKER_USERNAME` (nom d'utilisateur Nexus)
+  
+<p align="right">(<a href="#jenkins-top">Retour au debut de Jenkins</a>)</p>
+<p align="right">(<a href="#readme-top">Retour en haut du readme</a>)</p>
 
-<p align="right">(<a href="#table-des-matières">back to top</a>)</p>
 
 
