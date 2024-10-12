@@ -34,6 +34,20 @@ pipeline {
                 sh 'mvn test'
             }
         }
+        // Référence --> https://www.lambdatest.com/blog/jenkins-declarative-pipeline-examples/
+        // Mécanisme qui bloque la création d'une image docker si la couverture de test est en deça de 60%
+        stage("Code coverage") {
+                   steps {
+                       jacoco(
+                            execPattern: '**/target/**.exec',
+                            classPattern: '**/target/classes',
+                            sourcePattern: '**/src',
+                            inclusionPattern: '**/*.class',
+                            changeBuildStatus: true,
+                            minimumInstructionCoverage: '60',
+                            maximumInstructionCoverage: '100')
+                       }
+                   }
 
 
         stage('package') {
