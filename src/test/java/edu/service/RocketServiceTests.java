@@ -45,8 +45,15 @@ public class RocketServiceTests {
         RocketService rocketService = new RocketService(mockPersistanceService); // Inject mock here
 
         RocketDTO rocketAValider = rocketService.getRocket(1);
+        RocketDTO rocketAValiderNull = rocketService.getRocket(0131);
         assertEquals("Same Rocket",rocketDTOARetourner,rocketAValider);
+        assertEquals("Got the right name, MiniWheat ", "MiniWheat", rocketAValider.getName());
+        assertNotEquals("Got the wrong name, Snoop Dogg instead of MiniWheat ", "MiniWheat", rocketAValider);
         assertNotEquals("Not same Rocket",rocketDTOARetourner,rocketDTOError);
+        assertTrue("Rocket is named", rocketAValider.getName() != null && !rocketAValider.getName().isEmpty());
+        assertTrue("Rocket is typed", rocketAValider.getType() != null && !rocketAValider.getType().isEmpty());
+        assertNotNull("Rocket is not null", rocketAValider);
+        assertNull("Rocket is null", rocketAValiderNull);
     }
 
     @Test
@@ -70,12 +77,16 @@ public class RocketServiceTests {
         verify(mockPersistanceService).save(rocketDTOASauvegarder);
         when(mockPersistanceService.retrieve(2)).thenReturn(rocketDTOASauvegarder);
         RocketDTO rocketAValider = rocketService.getRocket(2);
+        RocketDTO rocketAValiderNull = rocketService.getRocket(0131);
 
         assertEquals("Same Rocket",rocketDTOASauvegarder,rocketAValider);
         assertNotEquals("Not same Rocket",rocketDTOAErreur,rocketAValider);
+        //assertEquals("Got the right name,MiniWheat ", "MiniWheat", rocketAValider.getName());
+        assertNotEquals("Got the wrong name, Snoop Dogg instead of MiniWheat ", "MiniWheat", rocketAValider);
+        assertTrue("Rocket is named", rocketAValider.getName() != null && !rocketAValider.getName().isEmpty());
+        assertTrue("Rocket is typed", rocketAValider.getType() != null && !rocketAValider.getType().isEmpty());
+        assertNotNull("Rocket is not null", rocketAValider);
+        assertNull("Rocket is null", rocketAValiderNull);
     }
-
-
-
 
 }
