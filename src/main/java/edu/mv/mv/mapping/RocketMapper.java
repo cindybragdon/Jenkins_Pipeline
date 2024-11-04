@@ -1,11 +1,10 @@
-package edu.mv.mapping;
+package edu.mv.mv.mapping;
 
+import edu.mv.mv.db.models.Rocket;
+import edu.mv.mv.models.RocketDTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
-
-import edu.mv.db.models.Rocket;
-import edu.mv.models.RocketDTO;
 
 @Mapper
 public interface RocketMapper {

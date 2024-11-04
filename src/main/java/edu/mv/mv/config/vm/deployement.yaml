@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: maintenance
+  namespace: eq19
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: eq19
+  template:
+    metadata:
+      labels:
+        app: maintenance
+    spec:
+      containers:
+        - name: eq19
+          image: 192.168.107.134/edu.mv/eq19:V
+          ports:
+            - containerPort: 8082
+      imagePullSecrets:
+        - name: regcred
+      restartPolicy: Always

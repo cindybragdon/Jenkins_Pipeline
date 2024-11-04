@@ -3,6 +3,13 @@ pipeline {
         label 'JavaAgent2'
     }
 
+    //parameters {
+     //   choice(name: 'DEPLOY_SERVER', choices: ['10.10.0.43','10.10.0.42','10.10.0.41'], description: 'Serveur?')
+     //   string(name: 'SSH_AGENT_CRED', defaultValue: 'ssh-minikube-3', description: 'Quel ssh agent credentials?')
+     //   booleanParam(name: 'NEW_NAMESPACE', defaultValue: false, description: 'Nouveau namespace?')
+     //   booleanParam(name: 'SKIP_PUSH', defaultValue: true, description: 'Skip Nexus?')
+  //  }
+
     environment {
     IMAGE = readMavenPom().getArtifactId()
     VERSION = readMavenPom().getVersion()
@@ -23,11 +30,7 @@ pipeline {
         }
 
 
-        stage('build') {
-            steps {
-                sh "mvn install"
-            }
-        }
+
 
         stage('test') {
             steps {
@@ -49,6 +52,11 @@ pipeline {
                        }
                    }
 
+         stage('build') {
+                    steps {
+                        sh "mvn install"
+                    }
+                }
 
         stage('package') {
                steps {

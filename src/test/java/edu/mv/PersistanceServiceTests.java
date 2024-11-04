@@ -1,9 +1,9 @@
-package edu;
-import edu.mv.persistence.PersistenceService;
-import edu.mv.persistence.RocketNotFoundException;
-import edu.mv.db.models.Rocket;
-import edu.mv.models.RocketDTO;
-import edu.mv.repository.RocketRepository;
+package edu.mv;
+import edu.mv.mv.persistence.PersistenceService;
+import edu.mv.mv.persistence.RocketNotFoundException;
+import edu.mv.mv.db.models.Rocket;
+import edu.mv.mv.models.RocketDTO;
+import edu.mv.mv.repository.RocketRepository;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;

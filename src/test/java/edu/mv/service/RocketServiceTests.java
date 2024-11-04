@@ -1,20 +1,15 @@
-package edu.service;
+package edu.mv.service;
 
 
-import edu.mv.db.models.Rocket;
-import edu.mv.models.RocketDTO;
-import edu.mv.persistence.PersistenceService;
-import edu.mv.repository.RocketRepository;
-import edu.mv.service.RocketService;
+import edu.mv.mv.models.RocketDTO;
+import edu.mv.mv.persistence.PersistenceService;
+import edu.mv.mv.repository.RocketRepository;
+import edu.mv.mv.service.RocketService;
 
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import java.util.Optional;
 
 import static org.mockito.Mockito.*;
 import static org.springframework.test.util.AssertionErrors.*;

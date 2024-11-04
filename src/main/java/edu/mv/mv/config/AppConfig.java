@@ -1,4 +1,4 @@
-package edu.mv.config;
+package edu.mv.mv.config;
 
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;

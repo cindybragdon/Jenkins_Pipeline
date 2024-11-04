@@ -1,4 +1,4 @@
-package edu.mv.models;
+package edu.mv.mv.models;
 
 public class RocketResponse {
 
