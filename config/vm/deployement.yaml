@@ -15,9 +15,9 @@ spec:
     spec:
       containers:
         - name: cls515-labmaven-eq19
-          image: 10.96.15.83:8082/edu.mv/cls515-labmaven-eq19:1.0.3
+          image: 10.96.15.83:8082/edu.mv/cls515-labmaven-eq19:1.0.4
           ports:
-            - containerPort: 8082
+            - containerPort: 8080
       imagePullSecrets:
         - name: regcred
       restartPolicy: Always
