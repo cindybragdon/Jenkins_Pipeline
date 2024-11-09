@@ -133,7 +133,7 @@ pipeline {
 
         stage('Git Clone repertoire code source') {
             steps {
-                git 'git@github.com:420-515-MV/cls515-labmaven-eq19.git' // Clone le dépôt GitHub vers  Jenkins.
+                git 'git@github.com:420-515-MV/cls515-labmaven-eq19.git' // Clone le dépôt GitHub vers Jenkins.
             }
         }
 
@@ -145,7 +145,7 @@ pipeline {
 
         stage('Build de limage Docker') {
             steps {
-                sh "docker build -t ${NEXUS_URL}/edu.mv/cls515-labmaven-eq19:${VERSION}" // Image Docker avec un tag de version
+                sh "docker build . -t ${NEXUS_URL}/edu.mv/cls515-labmaven-eq19:${VERSION}" // Image Docker avec un tag de version
             }
         }
 
