@@ -24,18 +24,19 @@ pipeline {
 
     stages {
         stage('Connexion ssh'){
-            sshagent(credentials : ['minikube-dev-2-ssh']) {
+            steps{
+                script{
+                    sshagent(credentials : ['minikube-dev-2-ssh']) {
+                                   sh '''
+                                          [ -d ~/.ssh ] || mkdir ~/.ssh && chmod 0700 ~/.ssh
+                                          ssh-keyscan -t rsa,dsa ${MINIKUBE} >> ~/.ssh/known_hosts
+                                          ssh ${USER_MINIKUBE}@${MINIKUBE} "rm -rf ${NAMESPACE}"
+                                          ssh ${USER_MINIKUBE}@${MINIKUBE} "mkdir ${NAMESPACE}"
+                                          ssh ${USER_MINIKUBE}@${MINIKUBE} "scp -r config/${ENV_KUBE} ${MINIKUBE}:/home/${USER_MINIKUBE}/${NAMESPACE}"
 
-
-
-                           sh '''
-                                  [ -d ~/.ssh ] || mkdir ~/.ssh && chmod 0700 ~/.ssh
-                                  ssh-keyscan -t rsa,dsa ${MINIKUBE} >> ~/.ssh/known_hosts
-                                  ssh ${USER_MINIKUBE}@${MINIKUBE} "rm -rf ${NAMESPACE}"
-                                  ssh ${USER_MINIKUBE}@${MINIKUBE} "mkdir ${NAMESPACE}"
-                                  ssh ${USER_MINIKUBE}@${MINIKUBE} "scp -r config/${ENV_KUBE} ${MINIKUBE}:/home/${USER_MINIKUBE}/${NAMESPACE}"
-
-                            '''
+                                    '''
+                      }
+                }
             }
         }
     }
