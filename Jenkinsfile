@@ -23,6 +23,44 @@ pipeline {
     }
 
     stages {
+     // Étape 2: Nettoyage et construction du projet Maven
+            stage('Clean & Build') {
+                steps {
+                    sh 'mvn clean install'
+                }
+            }
+
+            // Étape 3: Code Coverage
+            stage('Code Coverage') {
+                steps {
+                    jacoco(
+                        execPattern: '**/target/**.exec',
+                        classPattern: '**/target/classes',
+                        sourcePattern: '**/src',
+                        inclusionPattern: '**/*.class',
+                        changeBuildStatus: true,
+                        minimumInstructionCoverage: '60',
+                        maximumInstructionCoverage: '100'
+                    )
+                }
+            }
+
+            // Étape 4: Création de l'image Docker avec le tag versionné
+            stage('Docker Build') {
+                steps {
+                    echo 'Building Docker Image'
+                    sh "docker build . -t ${NEXUS_1}/edu.mv/cls515-labmaven-eq19:${VERSION}"
+                }
+            }
+
+            // Étape 5: Push de l'image Docker vers Nexus
+            stage('Push Image to Nexus') {
+                steps {
+                    echo "Publishing Image to Nexus ${NEXUS_1}"
+                    sh "echo ${NEXUS_PASSWORD} | docker login ${NEXUS_1} --username ${NEXUS_DOCKER_USERNAME} --password-stdin"
+                    sh "docker push ${NEXUS_1}/edu.mv/cls515-labmaven-eq19:${VERSION}"
+                }
+            }
         stage('Connexion ssh'){
             steps{
                 script{
