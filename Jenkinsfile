@@ -11,12 +11,14 @@ pipeline {
     parameters {
         choice(name: 'ENVIRONMENT', choices: ['vm', 'dev'], description: 'Choice of deployment environment: vm or dev')
         choice(name: 'MINIKUBE', choices: ['MINIKUBE_1', 'MINIKUBE_2', 'MINIKUBE_3'], description: 'Choice of Minikube')
+        booleanParam(name: 'NEW_NAMESPACE', defaultValue: false, description: 'Nouveau namespace?')
     }
 
     environment {
         IMAGE = readMavenPom().getArtifactId()
         VERSION = readMavenPom().getVersion()
         EQUIPE = 'eq19'
+        USER_KUBE_1 = user1
         /**
         NEXUS_1 = 'http://10.10.0.30:8081/'
         NEXUS_DOCKER_USERNAME = 'user1'
@@ -28,22 +30,25 @@ pipeline {
 
         stage('Connexion ssh'){
             sshagent(credentials : ['minikube-dev-2']) {
-                       echo "connect to ${env.DEPLOY_SERVER}"
-                ssh ${USER_KUBE_1}@${DEPLOY_SERVER} "rm -rf ${EQUIPE}"
-                ssh ${USER_KUBE_1}@${DEPLOY_SERVER} "mkdir ${EQUIPE}"
-                ssh ${USER_KUBE_1}@${DEPLOY_SERVER}
-                scp -r config/${ENV_KUBE} ${DEPLOY_SERVER}:/home/${USER_KUBE_1}/${EQUIPE}
-                sh echo "SSH : You are connected"
+                       echo "connect to ${params.MINIKUBE_2}"
+                sh "ssh ${USER_KUBE_1}@${DEPLOY_SERVER} "rm -rf ${EQUIPE}" "
+                sh "ssh ${USER_KUBE_1}@${DEPLOY_SERVER} "mkdir ${EQUIPE}" "
+                sh "ssh ${USER_KUBE_1}@${DEPLOY_SERVER} "
+                sh "scp -r config/${ENV_KUBE} ${DEPLOY_SERVER}:/home/${USER_KUBE_1}/${EQUIPE} "
+                sh "echo 'SSH : You are connected' "
         }
 
-        /**
-        // Étape : Clone du dépôt Git
-        stage('Git Clone') {
-            steps {
-                git 'git@github.com:420-515-MV/cls515-labmaven-${EQUIPE}.git'
-            }
+        stage('Create namespace') {
+                when {
+                    expression {
+                        params.NEW_NAMESPACE == false
+                    }
+                }
+                steps {
+                     sh "ssh user@${USER_KUBE_1} 'minikube kubectl -- create namespace ${EQUIPE}' "
+                }
         }
-        *//
+
 
         // Étape 2: Nettoyage et construction du projet Maven
         stage('Clean & Build') {
