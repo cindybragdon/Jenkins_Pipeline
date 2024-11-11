@@ -28,22 +28,22 @@ pipeline {
 
     stages {
         stage('Connexion ssh'){
-        sshagent(credentials : ['minikube-dev-2-ssh']) {
-                        echo "connect to ${params.MINIKUBE}"
-                        //sh "ssh ${USER_KUBE_1}@${MINIKUBE} 'rm -rf ${NAMESPACE}'"
-                        //sh "ssh ${USER_KUBE_1}@${MINIKUBE} 'mkdir ${NAMESPACE}'"
-                        //sh "ssh ${USER_KUBE_1}@${MINIKUBE} 'scp -r config/${ENV_KUBE} ${USER_KUBE_1}""${MINIKUBE}:/home/${USER_KUBE_1}/${NAMESPACE}'"
-                        //echo "connecté"
+            sshagent(credentials : ['minikube-dev-2-ssh']) {
 
-                       sh '''
-                              [ -d ~/.ssh ] || mkdir ~/.ssh && chmod 0700 ~/.ssh
-                              ssh-keyscan -t rsa,dsa ${params.MINIKUBE} >> ~/.ssh/known_hosts
-                              ssh ${USER_MINIKUBE}@${params.MINIKUBE} "rm -rf ${NAMESPACE}"
-                              ssh ${USER_MINIKUBE}@${params.MINIKUBE} "mkdir ${NAMESPACE}"
-                              ssh ${USER_MINIKUBE}@${params.MINIKUBE} "scp -r config/${ENV_KUBE} ${params.MINIKUBE}:/home/${USER_MINIKUBE}/${NAMESPACE}"
+                            //sh "ssh ${USER_KUBE_1}@${MINIKUBE} 'rm -rf ${NAMESPACE}'"
+                            //sh "ssh ${USER_KUBE_1}@${MINIKUBE} 'mkdir ${NAMESPACE}'"
+                            //sh "ssh ${USER_KUBE_1}@${MINIKUBE} 'scp -r config/${ENV_KUBE} ${USER_KUBE_1}""${MINIKUBE}:/home/${USER_KUBE_1}/${NAMESPACE}'"
+                            //echo "connecté"
 
-                        '''
-                    }
+                           sh '''
+                                  [ -d ~/.ssh ] || mkdir ~/.ssh && chmod 0700 ~/.ssh
+                                  ssh-keyscan -t rsa,dsa ${MINIKUBE} >> ~/.ssh/known_hosts
+                                  ssh ${USER_MINIKUBE}@${MINIKUBE} "rm -rf ${NAMESPACE}"
+                                  ssh ${USER_MINIKUBE}@${MINIKUBE} "mkdir ${NAMESPACE}"
+                                  ssh ${USER_MINIKUBE}@${MINIKUBE} "scp -r config/${ENV_KUBE} ${MINIKUBE}:/home/${USER_MINIKUBE}/${NAMESPACE}"
+
+                            '''
+                        }
 
 
         }
