@@ -18,7 +18,7 @@ pipeline {
         IMAGE = readMavenPom().getArtifactId()
         VERSION = readMavenPom().getVersion()
         NAMESPACE = 'eq19'
-        USER_MINIKUBE = user1
+        USER_MINIKUBE = 'user1'
 
     }
 
