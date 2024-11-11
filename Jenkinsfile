@@ -38,6 +38,7 @@ pipeline {
                           scp -r config/${ENV_KUBE} ${DEPLOY_SERVER}:/home/${USER_MINIKUBE}/${USER_PERSONNEL}
            '''
         }
+        }
 
         /**
         stage('Connexion ssh'){
