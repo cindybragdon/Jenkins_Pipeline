@@ -17,8 +17,8 @@ pipeline {
     environment {
         IMAGE = readMavenPom().getArtifactId()
         VERSION = readMavenPom().getVersion()
-        EQUIPE = 'eq19'
-        USER_KUBE_1 = user1
+        USER_PERSONNEL = 'eq19'
+        USER_MINIKUBE = user1
         /**
         NEXUS_1 = 'http://10.10.0.30:8081/'
         NEXUS_DOCKER_USERNAME = 'user1'
@@ -28,6 +28,18 @@ pipeline {
 
     stages {
 
+        stage('SSH connexion'){
+        sh '''
+                          [ -d ~/.ssh ] || mkdir ~/.ssh && chmod 0700 ~/.ssh
+                          ssh-keyscan -t rsa,dsa ${DEPLOY_SERVER} >> ~/.ssh/known_hosts
+                          ssh ${USER_MINIKUBE}@${DEPLOY_SERVER} "rm -rf ${USER_PERSONNEL}"
+                          ssh ${USER_MINIKUBE}@${DEPLOY_SERVER} "mkdir ${USER_PERSONNEL}"
+                          ssh ${USER_MINIKUBE}@${DEPLOY_SERVER}
+                          scp -r config/${ENV_KUBE} ${DEPLOY_SERVER}:/home/${USER_MINIKUBE}/${USER_PERSONNEL}
+           '''
+        }
+
+        /**
         stage('Connexion ssh'){
             sshagent(credentials : ['minikube-dev-2']) {
                        echo "connect to ${params.MINIKUBE_2}"
@@ -37,6 +49,7 @@ pipeline {
                 sh "scp -r config/${ENV_KUBE} ${DEPLOY_SERVER}:/home/${USER_KUBE_1}/${EQUIPE} "
                 sh "echo 'SSH : You are connected' "
         }
+        *//
 
         stage('Create namespace') {
                 when {
