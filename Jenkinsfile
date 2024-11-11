@@ -39,6 +39,7 @@ pipeline {
            '''
         }
         }
+        }
 
         /**
         stage('Connexion ssh'){
@@ -50,7 +51,7 @@ pipeline {
                 sh "scp -r config/${ENV_KUBE} ${DEPLOY_SERVER}:/home/${USER_KUBE_1}/${EQUIPE} "
                 sh "echo 'SSH : You are connected' "
         }
-        *//
+
 
         stage('Create namespace') {
                 when {
@@ -160,4 +161,4 @@ pipeline {
         }
     }
 }
-
+*//
