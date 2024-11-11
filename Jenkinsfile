@@ -30,10 +30,7 @@ pipeline {
         stage('Connexion ssh'){
             sshagent(credentials : ['minikube-dev-2-ssh']) {
 
-                            //sh "ssh ${USER_KUBE_1}@${MINIKUBE} 'rm -rf ${NAMESPACE}'"
-                            //sh "ssh ${USER_KUBE_1}@${MINIKUBE} 'mkdir ${NAMESPACE}'"
-                            //sh "ssh ${USER_KUBE_1}@${MINIKUBE} 'scp -r config/${ENV_KUBE} ${USER_KUBE_1}""${MINIKUBE}:/home/${USER_KUBE_1}/${NAMESPACE}'"
-                            //echo "connecté"
+
 
                            sh '''
                                   [ -d ~/.ssh ] || mkdir ~/.ssh && chmod 0700 ~/.ssh
@@ -43,13 +40,9 @@ pipeline {
                                   ssh ${USER_MINIKUBE}@${MINIKUBE} "scp -r config/${ENV_KUBE} ${MINIKUBE}:/home/${USER_MINIKUBE}/${NAMESPACE}"
 
                             '''
-                        }
-
-                    }
-             }
-
+            }
         }
-        }
+    }
 
         /**
         stage('Connexion ssh'){
