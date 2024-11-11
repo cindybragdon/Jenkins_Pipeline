@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: cls515-labmaven-eq19
-  namespace: eq18
+  namespace: eq19
 spec:
   replicas: 1
   selector:
@@ -15,9 +15,9 @@ spec:
     spec:
       containers:
         - name: cls515-labmaven-eq19
-          image: $NEXUS_1/edu.mv/cls515-labmaven-eq19:$VERSION
+          image:  10.10.0.30:8082/edu.mv/cls515-labmaven-eq19:1.0.9
           ports:
-            - containerPort: 8082
+            - containerPort: 8080
       imagePullSecrets:
         - name: regcred
       restartPolicy: Always

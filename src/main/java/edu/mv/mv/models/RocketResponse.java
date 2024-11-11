@@ -1,15 +1,14 @@
 package edu.mv.mv.models;
 
+import lombok.Getter;
+import lombok.Setter;
+
 public class RocketResponse {
 
-    public int getHttpStatusCode() {
-        return httpStatusCode;
-    }
 
-    public void setHttpStatusCode(int httpStatusCode) {
-        this.httpStatusCode = httpStatusCode;
-    }
 
+    @Setter
+    @Getter
     private int httpStatusCode;
     private String message;
 
