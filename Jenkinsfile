@@ -17,7 +17,7 @@ pipeline {
     environment {
         IMAGE = readMavenPom().getArtifactId()
         VERSION = readMavenPom().getVersion()
-        USER_PERSONNEL = 'eq19'
+        NAMESPACE = 'eq19'
         USER_MINIKUBE = user1
         /**
         NEXUS_1 = 'http://10.10.0.30:8081/'
@@ -28,17 +28,22 @@ pipeline {
 
     stages {
 
-        stage('SSH connexion'){
-        sh '''
-                          [ -d ~/.ssh ] || mkdir ~/.ssh && chmod 0700 ~/.ssh
-                          ssh-keyscan -t rsa,dsa ${DEPLOY_SERVER} >> ~/.ssh/known_hosts
-                          ssh ${USER_MINIKUBE}@${DEPLOY_SERVER} "rm -rf ${USER_PERSONNEL}"
-                          ssh ${USER_MINIKUBE}@${DEPLOY_SERVER} "mkdir ${USER_PERSONNEL}"
-                          ssh ${USER_MINIKUBE}@${DEPLOY_SERVER}
-                          scp -r config/${ENV_KUBE} ${DEPLOY_SERVER}:/home/${USER_MINIKUBE}/${USER_PERSONNEL}
-           '''
-        }
-        }
+         sshagent(credentials : ['minikube-dev-2-ssh']) {
+                                echo "connect to ${params.MINIKUBE}"
+                                //sh "ssh ${USER_KUBE_1}@${MINIKUBE} 'rm -rf ${NAMESPACE}'"
+                                //sh "ssh ${USER_KUBE_1}@${MINIKUBE} 'mkdir ${NAMESPACE}'"
+                                //sh "ssh ${USER_KUBE_1}@${MINIKUBE} 'scp -r config/${ENV_KUBE} ${USER_KUBE_1}""${MINIKUBE}:/home/${USER_KUBE_1}/${NAMESPACE}'"
+                                //echo "connecté"
+
+                               sh '''
+                                      [ -d ~/.ssh ] || mkdir ~/.ssh && chmod 0700 ~/.ssh
+                                      ssh-keyscan -t rsa,dsa ${params.MINIKUBE} >> ~/.ssh/known_hosts
+                                      ssh ${USER_MINIKUBE}@${params.MINIKUBE} "rm -rf ${NAMESPACE}"
+                                      ssh ${USER_MINIKUBE}@${params.MINIKUBE} "mkdir ${NAMESPACE}"
+                                      ssh ${USER_MINIKUBE}@${params.MINIKUBE} "scp -r config/${ENV_KUBE} ${params.MINIKUBE}:/home/${USER_MINIKUBE}/${NAMESPACE}"
+
+                                '''
+                            }
         }
 
         /**
