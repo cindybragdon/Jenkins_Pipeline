@@ -2,80 +2,69 @@ pipeline {
     agent {
         label 'JavaAgent'
     }
+
     parameters {
         choice(
-            name: 'ENVIRONMENT',
-            choices: ['vm', 'dev'],
-            description: 'Choice of deployment environment: vm or dev'
+            name: "DEPLOY_SERVER",
+            choices: ["vm", "dev"],
+            description: "Choix de l'environnement"
         )
         choice(
-            name: 'MINIKUBE',
-            choices: ['10.10.0.41', '10.10.0.42', '10.10.0.43'],
-            description: 'Choice of Minikube'
+            name: "MINIKUBE",
+            choices: ["10.10.0.41", "10.10.0.42", "10.10.0.43"],
+            description: "Minikube de déploiement"
         )
-        booleanParam(
-            name: 'NEW_NAMESPACE',
-            defaultValue: false,
-            description: 'Create a new namespace?'
+        choice(
+            name: "SKIP_NAMESPACE",
+            choices: ["Yes", "No"],
+            description: "Creating the namespace"
         )
-        booleanParam(
-            name: 'SKIP_PUSH',
-            defaultValue: true,
-            description: 'Skip Nexus push?'
+        choice(
+            name: "SKIP_PUSH",
+            choices: ["Yes", "No"],
+            description: "Skip push"
         )
     }
+
     environment {
         IMAGE = readMavenPom().getArtifactId()
         VERSION = readMavenPom().getVersion()
-        NAMESPACE = 'eq19'
-        USER_MINIKUBE = 'user1'
+        NAMESPACE = "eq8"
+        IP_NEXUS_VM = "192.168.5.129"
         NEXUS_PASSWORD = credentials('DEPLOY_USER_PASSWORD')
     }
-    stages {
-        // Clean & Build
-        stage('Clean & Build') {
-            when {
-                expression { params.SKIP_PUSH == false }
-            }
-            steps {
-                sh 'mvn clean install'
-            }
-        }
 
-        // Compile
-        stage('Compile') {
+    stages {
+        stage('compile') {
             when {
-                expression { params.SKIP_PUSH == false }
+                expression { params.SKIP_PUSH == "No" }
             }
             steps {
                 sh 'mvn compile'
             }
         }
 
-        // Package
-        stage('Package') {
+        stage('package') {
             when {
-                expression { params.SKIP_PUSH == false }
+                expression { params.SKIP_PUSH == "No" }
             }
             steps {
                 sh 'mvn package'
             }
         }
 
-        // Test
-        stage('Test') {
+        stage('test') {
             when {
-                expression { params.SKIP_PUSH == false }
+                expression { params.SKIP_PUSH == "No" }
             }
             steps {
                 sh 'mvn test'
             }
         }
 
-        // Code Coverage
-        stage('Code Coverage') {
+        stage('JaCoCo Report') {
             when {
-                expression { params.SKIP_PUSH == false }
+                expression { params.SKIP_PUSH == "No" }
             }
             steps {
                 jacoco(
@@ -84,57 +73,54 @@ pipeline {
                     sourcePattern: '**/src',
                     inclusionPattern: '**/*.class',
                     changeBuildStatus: true,
-                    minimumInstructionCoverage: '60',
-                    maximumInstructionCoverage: '100'
+                    minimumInstructionCoverage: '60'
                 )
             }
         }
 
-        // Docker Build
-        stage('Docker Build') {
+        stage('docker build') {
             when {
-                expression { params.SKIP_PUSH == false }
+                expression { params.SKIP_PUSH == "No" }
             }
             steps {
-                echo 'Building Docker Image'
-                sh "docker build . -t ${NEXUS_1}/edu.mv/cls515-labmaven-eq19:${VERSION}"
+                echo 'Building Image edu.mv/cls515-labmaven-eq8'
+                sh "docker build . -t ${NEXUS_1}/edu.mv/cls515-labmaven-eq8:${VERSION}"
             }
         }
 
-        // Push Image to Nexus
-        stage('Push Image to Nexus') {
+        stage('push image to Nexus') {
             when {
-                expression { params.SKIP_PUSH == false }
+                expression { params.SKIP_PUSH == "No" }
             }
             steps {
-                echo "Pushing Image to Nexus"
+                echo "Publication de l'image sur Nexus ${NEXUS_1}"
                 sh "echo ${NEXUS_PASSWORD} | docker login ${NEXUS_1} --username ${NEXUS_DOCKER_USERNAME} --password-stdin"
-                sh "docker push ${NEXUS_1}/edu.mv/cls515-labmaven-eq19:${VERSION}"
+                sh "docker push ${NEXUS_1}/edu.mv/cls515-labmaven-eq8:${VERSION}"
             }
         }
 
-        // Connexion SSH
-        stage('Connexion SSH') {
+        stage('Connect to ssh') {
             steps {
                 script {
+                    echo "Connect to Minikube..."
                     sshagent(credentials: ['minikube-dev-2-ssh']) {
-                        echo "Connecting via SSH..."
+                        echo "connect to ${params.MINIKUBE}"
                         sh '''
                             [ -d ~/.ssh ] || mkdir ~/.ssh && chmod 0700 ~/.ssh
                             ssh-keyscan -t rsa,dsa ${MINIKUBE} >> ~/.ssh/known_hosts
-                            ssh ${USER_MINIKUBE}@${MINIKUBE} "rm -rf ${NAMESPACE}"
-                            ssh ${USER_MINIKUBE}@${MINIKUBE} "mkdir ${NAMESPACE}"
-                            scp -r config/${ENVIRONMENT} ${MINIKUBE}:/home/${USER_MINIKUBE}/${NAMESPACE}
+                            ssh ${USER_KUBE_1}@${MINIKUBE} "rm -rf ${NAMESPACE}"
+                            ssh ${USER_KUBE_1}@${MINIKUBE} "mkdir ${NAMESPACE}"
+                            ssh ${USER_KUBE_1}@${MINIKUBE} "ls"
+                            scp -r config/${ENV_KUBE} ${MINIKUBE}:/home/${USER_KUBE_1}/${NAMESPACE}
                         '''
                     }
                 }
             }
         }
 
-        // Create Namespace
-        stage('Create Namespace') {
+        stage('Create namespace...') {
             when {
-                expression { params.NEW_NAMESPACE == true }
+                expression { params.SKIP_NAMESPACE == "No" }
             }
             steps {
                 sshagent(credentials: ['minikube-dev-2-ssh']) {
@@ -142,21 +128,20 @@ pipeline {
                     sh '''
                         [ -d ~/.ssh ] || mkdir ~/.ssh && chmod 0700 ~/.ssh
                         ssh-keyscan -t rsa,dsa ${MINIKUBE} >> ~/.ssh/known_hosts
-                        ssh ${USER_MINIKUBE}@${MINIKUBE} "minikube kubectl get namespace ${NAMESPACE} || minikube kubectl create namespace ${NAMESPACE}"
+                        ssh ${USER_KUBE_1}@${MINIKUBE} "minikube kubectl -- create namespace ${NAMESPACE}"
                     '''
                 }
             }
         }
 
-        stage('Apply Kubernetes Config') {
+        stage('Apply minikube...') {
             steps {
                 sshagent(credentials: ['minikube-dev-2-ssh']) {
-                    echo "Deploying to Minikube..."
+                    echo "Deploying on Minikube..."
                     sh '''
                         [ -d ~/.ssh ] || mkdir ~/.ssh && chmod 0700 ~/.ssh
                         ssh-keyscan -t rsa,dsa ${MINIKUBE} >> ~/.ssh/known_hosts
-                        # Use external kubectl instead of minikube's kubectl
-                        ssh ${USER_MINIKUBE}@${MINIKUBE} "minikube kubectl apply -f /home/${USER_MINIKUBE}/${NAMESPACE}/config/${ENVIRONMENT} --namespace=${NAMESPACE}"
+                        ssh ${USER_KUBE_1}@${MINIKUBE} "cd ${NAMESPACE}" && ls && cd config && cd dev && ls && minikube kubectl -- apply -f . --namespace=${NAMESPACE}
                     '''
                 }
             }
