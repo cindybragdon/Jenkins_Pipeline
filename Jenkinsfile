@@ -170,28 +170,18 @@ pipeline {
                 }
             }
         }
-        stage('Deploy to Kubernetes') {
+        stage('Apply minikube...') {
                     steps {
-                        script {
-                            if (params.ENVIRONMENT == 'vm') {
-                                echo 'Deploying to vm'
-                                steps {
-                                        script {
-                                          kubernetesDeploy(configs: "deployment.yaml",
-                                                                         "service.yaml")
-                                        }
-                                     }
-                            } else if (params.ENVIRONMENT == 'dev') {
-                                echo 'Deploying to server dev'
-                                // Setup deployment to CMV remote server
-                                sh "minikube kubectl config use-context serverMV-context"
-                                // Apply the Kubernetes deployment configuration
-                                sh "minikube kubectl apply -f deployment.yaml"
-                                // Update image in deployment
-                                sh "minikube kubectl set image deployment/my-deployment my-container=${NEXUS_1}/edu.mv/cls515-labmaven-eq19:${VERSION}"
-                            }
+                        sshagent(credentials : ['minikube-dev-2-ssh']) {
+                            echo "Deploying  on Minikube..."
+                            sh '''
+                                  [ -d ~/.ssh ] || mkdir ~/.ssh && chmod 0700 ~/.ssh
+                                  ssh-keyscan -t rsa,dsa ${MINIKUBE} >> ~/.ssh/known_hosts
+                                  ssh ${USER_KUBE_1}@${MINIKUBE} "cd ${NAMESPACE}" && ls && cd config && cd dev && ls && minikube kubectl -- apply -f . --namespace=${NAMESPACE}
+
+                            '''
                         }
                     }
-            }
+        }
     }
 }
