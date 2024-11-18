@@ -16,12 +16,12 @@ pipeline {
         booleanParam(
             name: 'NEW_NAMESPACE',
             defaultValue: false,
-            description: 'Nouveau namespace?'
+            description: 'Create a new namespace?'
         )
         booleanParam(
             name: 'SKIP_PUSH',
             defaultValue: true,
-            description: 'Skip Nexus?'
+            description: 'Skip Nexus push?'
         )
     }
     environment {
@@ -32,60 +32,50 @@ pipeline {
         NEXUS_PASSWORD = credentials('DEPLOY_USER_PASSWORD')
     }
     stages {
-        // Stage 1: Clean & Build
+        // Clean & Build
         stage('Clean & Build') {
             when {
-                expression {
-                    params.SKIP_PUSH == false
-                }
+                expression { params.SKIP_PUSH == false }
             }
             steps {
                 sh 'mvn clean install'
             }
         }
 
-        // Stage 2: Compile
+        // Compile
         stage('Compile') {
             when {
-                expression {
-                    params.SKIP_PUSH == false
-                }
+                expression { params.SKIP_PUSH == false }
             }
             steps {
                 sh 'mvn compile'
             }
         }
 
-        // Stage 3: Package
+        // Package
         stage('Package') {
             when {
-                expression {
-                    params.SKIP_PUSH == false
-                }
+                expression { params.SKIP_PUSH == false }
             }
             steps {
                 sh 'mvn package'
             }
         }
 
-        // Stage 4: Test
+        // Test
         stage('Test') {
             when {
-                expression {
-                    params.SKIP_PUSH == false
-                }
+                expression { params.SKIP_PUSH == false }
             }
             steps {
                 sh 'mvn test'
             }
         }
 
-        // Stage 5: Code Coverage
+        // Code Coverage
         stage('Code Coverage') {
             when {
-                expression {
-                    params.SKIP_PUSH == false
-                }
+                expression { params.SKIP_PUSH == false }
             }
             steps {
                 jacoco(
@@ -100,12 +90,10 @@ pipeline {
             }
         }
 
-        // Stage 6: Docker Build
+        // Docker Build
         stage('Docker Build') {
             when {
-                expression {
-                    params.SKIP_PUSH == false
-                }
+                expression { params.SKIP_PUSH == false }
             }
             steps {
                 echo 'Building Docker Image'
@@ -113,26 +101,24 @@ pipeline {
             }
         }
 
-        // Stage 7: Push Image to Nexus
+        // Push Image to Nexus
         stage('Push Image to Nexus') {
             when {
-                expression {
-                    params.SKIP_PUSH == false
-                }
+                expression { params.SKIP_PUSH == false }
             }
             steps {
-                echo "Publishing Image to Nexus ${NEXUS_1}"
+                echo "Pushing Image to Nexus"
                 sh "echo ${NEXUS_PASSWORD} | docker login ${NEXUS_1} --username ${NEXUS_DOCKER_USERNAME} --password-stdin"
                 sh "docker push ${NEXUS_1}/edu.mv/cls515-labmaven-eq19:${VERSION}"
             }
         }
 
-        // Stage 8: Connexion SSH
+        // Connexion SSH
         stage('Connexion SSH') {
             steps {
                 script {
                     sshagent(credentials: ['minikube-dev-2-ssh']) {
-                        echo "Connexion SSH..."
+                        echo "Connecting via SSH..."
                         sh '''
                             [ -d ~/.ssh ] || mkdir ~/.ssh && chmod 0700 ~/.ssh
                             ssh-keyscan -t rsa,dsa ${MINIKUBE} >> ~/.ssh/known_hosts
@@ -145,7 +131,7 @@ pipeline {
             }
         }
 
-        // Stage 9: Create Namespace
+        // Create Namespace
         stage('Create Namespace') {
             when {
                 expression { params.NEW_NAMESPACE == true }
@@ -162,17 +148,16 @@ pipeline {
             }
         }
 
-        // Stage 10: Apply minikube...
-        stage('Apply minikube...') {
+        // Apply Kubernetes Configuration
+        stage('Apply Kubernetes Config') {
             steps {
                 sshagent(credentials: ['minikube-dev-2-ssh']) {
-                    echo "Deploying on Minikube..."
+                    echo "Deploying to Minikube..."
                     sh '''
                         [ -d ~/.ssh ] || mkdir ~/.ssh && chmod 0700 ~/.ssh
                         ssh-keyscan -t rsa,dsa ${MINIKUBE} >> ~/.ssh/known_hosts
                         ssh ${USER_MINIKUBE}@${MINIKUBE} "minikube kubectl get namespace ${NAMESPACE}"
-                        ssh ${USER_MINIKUBE}@${MINIKUBE} "minikube kubectl get secrets -n ${NAMESPACE}"
-                        ssh ${USER_MINIKUBE}@${MINIKUBE} "cd /home/${USER_MINIKUBE}/${NAMESPACE}/config/${ENVIRONMENT} && minikube kubectl apply -f . -n ${NAMESPACE}"
+                        ssh ${USER_MINIKUBE}@${MINIKUBE} "minikube kubectl apply -f /home/${USER_MINIKUBE}/${NAMESPACE}/config/${ENVIRONMENT} --namespace=${NAMESPACE}"
                     '''
                 }
             }
