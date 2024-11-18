@@ -155,10 +155,8 @@ pipeline {
                     sh '''
                         [ -d ~/.ssh ] || mkdir ~/.ssh && chmod 0700 ~/.ssh
                         ssh-keyscan -t rsa,dsa ${MINIKUBE} >> ~/.ssh/known_hosts
-                        # Check if the namespace exists by listing pods in the namespace
-                        ssh ${USER_MINIKUBE}@${MINIKUBE} "minikube kubectl get pods -n ${NAMESPACE}"
-                        # Now apply the Kubernetes config for the given namespace
-                        ssh ${USER_MINIKUBE}@${MINIKUBE} "minikube kubectl apply -f /home/${USER_MINIKUBE}/${NAMESPACE}/config/${ENVIRONMENT} -n ${NAMESPACE}"
+                        # Use external kubectl instead of minikube's kubectl
+                        ssh ${USER_MINIKUBE}@${MINIKUBE} "kubectl apply -f /home/${USER_MINIKUBE}/${NAMESPACE}/config/${ENVIRONMENT} --namespace=${NAMESPACE}"
                     '''
                 }
             }
