@@ -15,7 +15,7 @@ pipeline {
         )
         choice(
             name: 'MINIKUBE', 
-            choices: ['MINIKUBE_1', 'MINIKUBE_2', 'MINIKUBE_3'], 
+            choices: ['10.10.0.41', '10.10.0.42', '10.10.0.43'],
             description: 'Choice of Minikube'
         )
         booleanParam(
