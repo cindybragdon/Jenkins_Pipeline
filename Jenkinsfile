@@ -1,35 +1,29 @@
-// https://www.jenkins.io/doc/book/pipeline/syntax/
-// https://help.skytap.com/connect-to-a-linux-vm-with-ssh.html
-// https://www.jenkins.io/doc/book/installing/kubernetes/
-
 pipeline {
     agent {
         label 'JavaAgent'
     }
-
     parameters {
         choice(
-            name: 'ENVIRONMENT', 
-            choices: ['vm', 'dev'], 
+            name: 'ENVIRONMENT',
+            choices: ['vm', 'dev'],
             description: 'Choice of deployment environment: vm or dev'
         )
         choice(
-            name: 'MINIKUBE', 
+            name: 'MINIKUBE',
             choices: ['10.10.0.41', '10.10.0.42', '10.10.0.43'],
             description: 'Choice of Minikube'
         )
         booleanParam(
-            name: 'NEW_NAMESPACE', 
-            defaultValue: false, 
+            name: 'NEW_NAMESPACE',
+            defaultValue: false,
             description: 'Nouveau namespace?'
         )
         booleanParam(
-            name: 'SKIP_PUSH', 
-            defaultValue: true, 
+            name: 'SKIP_PUSH',
+            defaultValue: true,
             description: 'Skip Nexus?'
         )
     }
-
     environment {
         IMAGE = readMavenPom().getArtifactId()
         VERSION = readMavenPom().getVersion()
@@ -37,21 +31,20 @@ pipeline {
         USER_MINIKUBE = 'user1'
         NEXUS_PASSWORD = credentials('DEPLOY_USER_PASSWORD')
     }
-
     stages {
-        // Étape 1: Nettoyage et construction du projet Maven
+        // Stage 1: Clean & Build
         stage('Clean & Build') {
             when {
-                  expression {
-                       params.SKIP_PUSH == false
-                  }
+                expression {
+                    params.SKIP_PUSH == false
+                }
             }
             steps {
                 sh 'mvn clean install'
             }
         }
 
-        // Étape 2: Compilation
+        // Stage 2: Compile
         stage('Compile') {
             when {
                 expression {
@@ -63,7 +56,7 @@ pipeline {
             }
         }
 
-        // Étape 3: Emballage
+        // Stage 3: Package
         stage('Package') {
             when {
                 expression {
@@ -75,7 +68,7 @@ pipeline {
             }
         }
 
-        // Étape 4: Tests
+        // Stage 4: Test
         stage('Test') {
             when {
                 expression {
@@ -87,7 +80,7 @@ pipeline {
             }
         }
 
-        // Étape 5: Couverture de code
+        // Stage 5: Code Coverage
         stage('Code Coverage') {
             when {
                 expression {
@@ -107,7 +100,7 @@ pipeline {
             }
         }
 
-        // Étape 6: Création de l'image Docker avec le tag versionné
+        // Stage 6: Docker Build
         stage('Docker Build') {
             when {
                 expression {
@@ -120,7 +113,7 @@ pipeline {
             }
         }
 
-        // Étape 7: Push de l'image Docker vers Nexus
+        // Stage 7: Push Image to Nexus
         stage('Push Image to Nexus') {
             when {
                 expression {
@@ -134,58 +127,57 @@ pipeline {
             }
         }
 
-        // Étape 8: Connexion SSH
+        // Stage 8: Connexion SSH
         stage('Connexion SSH') {
             steps {
                 script {
                     sshagent(credentials: ['minikube-dev-2-ssh']) {
-                    echo "Connexion SSH  ..."
+                        echo "Connexion SSH..."
                         sh '''
                             [ -d ~/.ssh ] || mkdir ~/.ssh && chmod 0700 ~/.ssh
                             ssh-keyscan -t rsa,dsa ${MINIKUBE} >> ~/.ssh/known_hosts
                             ssh ${USER_MINIKUBE}@${MINIKUBE} "rm -rf ${NAMESPACE}"
                             ssh ${USER_MINIKUBE}@${MINIKUBE} "mkdir ${NAMESPACE}"
-                            scp -r config/${ENV_KUBE} ${MINIKUBE}:/home/${USER_KUBE_1}/${NAMESPACE}
+                            scp -r config/${ENVIRONMENT} ${MINIKUBE}:/home/${USER_MINIKUBE}/${NAMESPACE}
                         '''
                     }
                 }
             }
         }
 
-        // Étape 9: Création du namespace
+        // Stage 9: Create Namespace
         stage('Create Namespace') {
             when {
-                expression {
-                    params.NEW_NAMESPACE == true
-                }
+                expression { params.NEW_NAMESPACE == true }
             }
             steps {
-                        sshagent(credentials: ['minikube-dev-2-ssh']) {
-                            echo "Creating namespace ..."
-                            sh '''
-                                [ -d ~/.ssh ] || mkdir ~/.ssh && chmod 0700 ~/.ssh
-                                ssh-keyscan -t rsa,dsa ${MINIKUBE} >> ~/.ssh/known_hosts
-                                ssh ${USER_KUBE_1}@${MINIKUBE} "minikube kubectl -- create namespace ${NAMESPACE}"
-                            '''
+                sshagent(credentials: ['minikube-dev-2-ssh']) {
+                    echo "Creating namespace..."
+                    sh '''
+                        [ -d ~/.ssh ] || mkdir ~/.ssh && chmod 0700 ~/.ssh
+                        ssh-keyscan -t rsa,dsa ${MINIKUBE} >> ~/.ssh/known_hosts
+                        ssh ${USER_MINIKUBE}@${MINIKUBE} "minikube kubectl -- get namespace ${NAMESPACE} || minikube kubectl -- create namespace ${NAMESPACE}"
+                    '''
                 }
             }
         }
+
+        // Stage 10: Apply minikube...
         stage('Apply minikube...') {
-                    steps {
-                        sshagent(credentials : ['minikube-dev-2-ssh']) {
-                            echo "Deploying  on Minikube..."
-                            sh '''
-                                  [ -d ~/.ssh ] || mkdir ~/.ssh && chmod 0700 ~/.ssh
-                                  ssh-keyscan -t rsa,dsa ${MINIKUBE} >> ~/.ssh/known_hosts
-
-                                  ssh ${USER_KUBE_1}@${MINIKUBE} "minikube kubectl -- get namespace ${NAMESPACE}"
-                                  ssh ${USER_KUBE_1}@${MINIKUBE} "minikube kubectl -- get secrets -n eq19"
-                                  ssh ${USER_KUBE_1}@${MINIKUBE} "minikube kubectl -- get secrets -n eq19 && cd ${NAMESPACE}" && ls && cd config && cd dev && ls && minikube kubectl -- apply -f . -n ${NAMESPACE}
-
-                            '''
-                        }
-                    }
-
+            steps {
+                sshagent(credentials: ['minikube-dev-2-ssh']) {
+                    echo "Deploying on Minikube..."
+                    sh '''
+                        [ -d ~/.ssh ] || mkdir ~/.ssh && chmod 0700 ~/.ssh
+                        ssh-keyscan -t rsa,dsa ${MINIKUBE} >> ~/.ssh/known_hosts
+                        ssh ${USER_MINIKUBE}@${MINIKUBE} "minikube kubectl -- get namespace ${NAMESPACE}"
+                        ssh ${USER_MINIKUBE}@${MINIKUBE} "minikube kubectl -- get secrets -n eq19"
+                        ssh ${USER_MINIKUBE}@${MINIKUBE} "minikube kubectl -- get secrets -n eq19 && cd ${NAMESPACE}" && ls
+                        cd config && cd ${ENVIRONMENT} && ls
+                        minikube kubectl -- apply -f . -n ${NAMESPACE}
+                    '''
+                }
+            }
         }
     }
 }
