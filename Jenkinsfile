@@ -148,7 +148,6 @@ pipeline {
             }
         }
 
-        // Apply Kubernetes Configuration
         stage('Apply Kubernetes Config') {
             steps {
                 sshagent(credentials: ['minikube-dev-2-ssh']) {
@@ -156,8 +155,10 @@ pipeline {
                     sh '''
                         [ -d ~/.ssh ] || mkdir ~/.ssh && chmod 0700 ~/.ssh
                         ssh-keyscan -t rsa,dsa ${MINIKUBE} >> ~/.ssh/known_hosts
-                        ssh ${USER_MINIKUBE}@${MINIKUBE} "minikube kubectl -- get --namespace=${NAMESPACE}"
-                        ssh ${USER_MINIKUBE}@${MINIKUBE} "minikube kubectl -- apply -f /home/${USER_MINIKUBE}/${NAMESPACE}/config/${ENVIRONMENT} --namespace=${NAMESPACE}"
+                        # Check if the namespace exists by listing pods in the namespace
+                        ssh ${USER_MINIKUBE}@${MINIKUBE} "minikube kubectl get pods --namespace=${NAMESPACE}"
+                        # Now apply the Kubernetes config for the given namespace
+                        ssh ${USER_MINIKUBE}@${MINIKUBE} "minikube kubectl apply -f /home/${USER_MINIKUBE}/${NAMESPACE}/config/${ENVIRONMENT} --namespace=${NAMESPACE}"
                     '''
                 }
             }
