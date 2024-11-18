@@ -29,7 +29,7 @@ pipeline {
     environment {
         IMAGE = readMavenPom().getArtifactId()
         VERSION = readMavenPom().getVersion()
-        NAMESPACE = "eq19"
+        NAMESPACE = "eq1999"
         IP_NEXUS_VM = "192.168.5.129"
         NEXUS_PASSWORD = credentials('DEPLOY_USER_PASSWORD')
     }
@@ -83,8 +83,8 @@ pipeline {
                 expression { params.SKIP_PUSH == "No" }
             }
             steps {
-                echo 'Building Image edu.mv/cls515-labmaven-eq19'
-                sh "docker build . -t ${NEXUS_1}/edu.mv/cls515-labmaven-eq19:${VERSION}"
+                echo 'Building Image edu.mv/cls515-labmaven-eq199'
+                sh "docker build . -t ${NEXUS_1}/edu.mv/cls515-labmaven-eq199:${VERSION}"
             }
         }
 
@@ -95,7 +95,7 @@ pipeline {
             steps {
                 echo "Publication de l'image sur Nexus ${NEXUS_1}"
                 sh "echo ${NEXUS_PASSWORD} | docker login ${NEXUS_1} --username ${NEXUS_DOCKER_USERNAME} --password-stdin"
-                sh "docker push ${NEXUS_1}/edu.mv/cls515-labmaven-eq19:${VERSION}"
+                sh "docker push ${NEXUS_1}/edu.mv/cls515-labmaven-eq199:${VERSION}"
             }
         }
 
