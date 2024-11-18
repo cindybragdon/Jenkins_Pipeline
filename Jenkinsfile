@@ -170,5 +170,28 @@ pipeline {
                 }
             }
         }
+        stage('Deploy to Kubernetes') {
+                    steps {
+                        script {
+                            if (params.ENVIRONMENT == 'vm') {
+                                echo 'Deploying to vm'
+                                steps {
+                                        script {
+                                          kubernetesDeploy(configs: "deployment.yaml",
+                                                                         "service.yaml")
+                                        }
+                                     }
+                            } else if (params.ENVIRONMENT == 'dev') {
+                                echo 'Deploying to server dev'
+                                // Setup deployment to CMV remote server
+                                sh "kubectl config use-context serverMV-context"
+                                // Apply the Kubernetes deployment configuration
+                                sh "kubectl apply -f deployment.yaml"
+                                // Update image in deployment
+                                sh "kubectl set image deployment/my-deployment my-container=${NEXUS_1}/edu.mv/cls515-labmaven-eq19:${VERSION}"
+                            }
+                        }
+                    }
+            }
     }
 }
