@@ -29,7 +29,7 @@ pipeline {
     environment {
         IMAGE = readMavenPom().getArtifactId()
         VERSION = readMavenPom().getVersion()
-        NAMESPACE = "eq1999"
+        NAMESPACE = "eq199"
         IP_NEXUS_VM = "192.168.5.129"
         NEXUS_PASSWORD = credentials('DEPLOY_USER_PASSWORD')
     }
