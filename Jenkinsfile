@@ -156,7 +156,7 @@ pipeline {
                     sh '''
                         [ -d ~/.ssh ] || mkdir ~/.ssh && chmod 0700 ~/.ssh
                         ssh-keyscan -t rsa,dsa ${MINIKUBE} >> ~/.ssh/known_hosts
-                        ssh ${USER_MINIKUBE}@${MINIKUBE} "minikube kubectl -- get namespace ${NAMESPACE} || minikube kubectl -- create namespace ${NAMESPACE}"
+                        ssh ${USER_MINIKUBE}@${MINIKUBE} "minikube kubectl get namespace ${NAMESPACE} || minikube kubectl create namespace ${NAMESPACE}"
                     '''
                 }
             }
@@ -170,11 +170,9 @@ pipeline {
                     sh '''
                         [ -d ~/.ssh ] || mkdir ~/.ssh && chmod 0700 ~/.ssh
                         ssh-keyscan -t rsa,dsa ${MINIKUBE} >> ~/.ssh/known_hosts
-                        ssh ${USER_MINIKUBE}@${MINIKUBE} "minikube kubectl -- get namespace ${NAMESPACE}"
-                        ssh ${USER_MINIKUBE}@${MINIKUBE} "minikube kubectl -- get secrets -n eq19"
-                        ssh ${USER_MINIKUBE}@${MINIKUBE} "minikube kubectl -- get secrets -n eq19 && cd ${NAMESPACE}" && ls
-                        cd config && cd ${ENVIRONMENT} && ls
-                        minikube kubectl -- apply -f . -n ${NAMESPACE}
+                        ssh ${USER_MINIKUBE}@${MINIKUBE} "minikube kubectl get namespace ${NAMESPACE}"
+                        ssh ${USER_MINIKUBE}@${MINIKUBE} "minikube kubectl get secrets -n ${NAMESPACE}"
+                        ssh ${USER_MINIKUBE}@${MINIKUBE} "cd /home/${USER_MINIKUBE}/${NAMESPACE}/config/${ENVIRONMENT} && minikube kubectl apply -f . -n ${NAMESPACE}"
                     '''
                 }
             }
