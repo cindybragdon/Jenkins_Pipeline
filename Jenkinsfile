@@ -177,6 +177,7 @@ pipeline {
                             sh '''
                                   [ -d ~/.ssh ] || mkdir ~/.ssh && chmod 0700 ~/.ssh
                                   ssh-keyscan -t rsa,dsa ${MINIKUBE} >> ~/.ssh/known_hosts
+                                  ssh ${USER_KUBE_1}@${MINIKUBE} "minikube kubectl -- get namespace ${NAMESPACE}"
                                   ssh ${USER_KUBE_1}@${MINIKUBE} "cd ${NAMESPACE}" && ls && cd config && cd dev && ls && minikube kubectl -- apply -f . -n ${NAMESPACE}
 
                             '''
