@@ -182,6 +182,10 @@ pipeline {
                                   ssh ${USER_KUBE_1}@${MINIKUBE} "cd ${NAMESPACE}" && ls && cd config && cd dev && ls && minikube kubectl -- apply -f . -n ${NAMESPACE}
 
                             '''
+                             sh '''     [ -d ~/.ssh ] || mkdir ~/.ssh && chmod 0700 ~/.ssh
+                                ssh-keyscan -t rsa,dsa ${DEPLOY_SERVER} >> ~/.ssh/known_hosts
+                                ssh ${USER_MINIKUBE}@${DEPLOY_SERVER} "minikube kubectl -- create secret docker-registry regcred --docker-server=${NEXUS_1} --docker-username=${NEXUS_DOCKER_USERNAME} --docker-password=${NEXUS_PASSWORD} --docker-email=de@deploy.com --namespace=${NAMESPACE}"
+                             '''
                         }
                     }
         }
