@@ -49,7 +49,7 @@ pipeline {
                 sshagent(credentials: ['minikube-dev-2-ssh']) {
                     sh """
                         scp -r config/${ENV_KUBE} ${USER_KUBE_1}@${params.MINIKUBE}:/home/${USER_KUBE_1}/${NAMESPACE}
-                        ssh ${USER_KUBE_1}@${params.MINIKUBE} "minikube kubectl -- apply -f /home/${USER_KUBE_1}/${NAMESPACE}/config/${ENV_KUBE} --namespace=${NAMESPACE}"
+                        ssh ${USER_KUBE_1}@${params.MINIKUBE} "cd ${NAMESPACE}" && ls && cd config && cd dev && ls && minikube kubectl -- apply -f . --namespace=${NAMESPACE}"
                     """
                 }
             }
