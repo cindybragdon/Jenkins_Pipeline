@@ -24,6 +24,13 @@ pipeline {
             }
         }
 
+        stage('install') {
+            when { expression { params.SKIP_PUSH == "No" } }
+            steps {
+                sh 'mvn clean install'
+            }
+        }
+
         stage('Build et push Docker') {
             when { expression { params.SKIP_PUSH == "No" } }
             steps {
