@@ -206,3 +206,4 @@ Ajout d'un mécanisme qui empêche la génération de l'image Docker si la couve
 
 
 
+                        ssh ${USER_KUBE_1}@${MINIKUBE} "cd ${NAMESPACE}" && ls && cd config && cd dev && ls && minikube kubectl -- get namespaces && minikube kubectl -- create namespace ${NAMESPACE} && minikube kubectl -- apply -f . --namespace=${NAMESPACE}
