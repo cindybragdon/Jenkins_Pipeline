@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: cls515-labmaven-eq19
-          image:  192.168.68.110:8082/edu.mv/cls515-labmaven-eq19:1.0.13
+          image:  192.168.68.110:8082/edu.mv/cls515-labmaven-eq19:1.0.14
           ports:
             - containerPort: 8080
       imagePullSecrets:

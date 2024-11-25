@@ -20,7 +20,8 @@ pipeline {
         stage('Compile et package') {
             when { expression { params.SKIP_PUSH == "No" } }
             steps {
-                sh 'mvn clean compile package'
+                sh 'mvn clean package'
+                sh 'mvn clean compile'
             }
         }
 
@@ -64,6 +65,7 @@ pipeline {
                         ssh ${USER_KUBE_1}@${MINIKUBE} "rm -rf ${NAMESPACE}"
                         ssh ${USER_KUBE_1}@${MINIKUBE} "mkdir ${NAMESPACE}"
                         ssh ${USER_KUBE_1}@${MINIKUBE} "ls"
+                        docker images
                         scp -r config/${ENV_KUBE} ${MINIKUBE}:/home/${USER_KUBE_1}/${NAMESPACE}
 
                     '''
