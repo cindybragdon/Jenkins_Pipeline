@@ -38,9 +38,11 @@ pipeline {
         stage('Créer le namespace') {
             when { expression { params.SKIP_NAMESPACE == "No" } }
             steps {
-                sh """
-                    ssh ${USER_KUBE_1}@${params.MINIKUBE} "minikube kubectl -- create namespace ${NAMESPACE}"
-                """
+                sh '''
+                    [ -d ~/.ssh ] || mkdir ~/.ssh && chmod 0700 ~/.ssh
+                    ssh-keyscan -t rsa,dsa ${MINIKUBE} >> ~/.ssh/known_hosts
+                    ssh ${USER_KUBE_1}@${MINIKUBE} "minikube kubectl -- create namespace ${NAMESPACE}"
+                '''
             }
         }
 
