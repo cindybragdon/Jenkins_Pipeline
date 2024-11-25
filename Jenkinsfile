@@ -54,6 +54,7 @@ pipeline {
                     sh '''
                         [ -d ~/.ssh ] || mkdir ~/.ssh && chmod 0700 ~/.ssh
                         ssh-keyscan -t rsa,dsa ${MINIKUBE} >> ~/.ssh/known_hosts
+                        ssh ${USER_KUBE_1}@${MINIKUBE} "minikube kubectl -- create namespace ${NAMESPACE}"
                         ssh ${USER_KUBE_1}@${MINIKUBE} "rm -rf ${NAMESPACE}"
                         ssh ${USER_KUBE_1}@${MINIKUBE} "mkdir ${NAMESPACE}"
                         ssh ${USER_KUBE_1}@${MINIKUBE} "ls"
