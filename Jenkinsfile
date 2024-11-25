@@ -48,6 +48,8 @@ pipeline {
             steps {
                 sshagent(credentials: ['minikube-dev-2-ssh']) {
                     sh """
+                        [ -d ~/.ssh ] || mkdir ~/.ssh && chmod 0700 ~/.ssh
+                        ssh-keyscan -t rsa,dsa ${MINIKUBE} >> ~/.ssh/known_hosts
                         scp -r config/${ENV_KUBE} ${params.MINIKUBE}:/home/${USER_KUBE_1}/${NAMESPACE}
                         ssh ${USER_KUBE_1}@${params.MINIKUBE} "cd ${NAMESPACE}" && ls && cd config && cd dev && ls && minikube kubectl -- apply -f . --namespace=${NAMESPACE}"
                     """
