@@ -54,7 +54,7 @@ pipeline {
                         ssh ${USER_KUBE_1}@${MINIKUBE} "mkdir ${NAMESPACE}"
                         ssh ${USER_KUBE_1}@${MINIKUBE} "ls"
                         scp -r config/${ENV_KUBE} ${MINIKUBE}:/home/${USER_KUBE_1}/${NAMESPACE}
-                        ssh ${USER_KUBE_1}@${params.MINIKUBE} "cd ${NAMESPACE}" && ls && cd config && cd dev && ls && minikube kubectl -- apply -f . --namespace=${NAMESPACE}"
+                        ssh ${USER_KUBE_1}@${params.MINIKUBE} "cd ${NAMESPACE}" && ls && cd config && cd dev && ls && minikube kubectl -- apply -f . --namespace=${NAMESPACE}
                     '''
                 }
             }
