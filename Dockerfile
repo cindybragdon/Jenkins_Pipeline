@@ -1,3 +1,5 @@
+#cls515-labmaven-eq19/pom.xml
+
 FROM eclipse-temurin:21
 EXPOSE 8080
 ARG JAR_FILE=/target/cls515-labmaven-eq19-1.0.13.jar

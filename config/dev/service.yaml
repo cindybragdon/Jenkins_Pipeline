@@ -1,12 +1,14 @@
+#cls515-labmaven-eq19/config/dev/service.yaml
+
 apiVersion: v1
 kind : Service
 metadata:
-  name: cls515-labmaven-eq199
-  namespace: eq199
+  name: cls515-labmaven-eq19
+  namespace: eq19
 spec:
   type: NodePort
   selector:
-    app: cls515-labmaven-eq199
+    app: cls515-labmaven-eq19
   ports:
     - protocol: TCP
       port: 8080

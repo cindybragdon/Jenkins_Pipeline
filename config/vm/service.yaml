@@ -1,3 +1,4 @@
+#cls515-labmaven-eq19/config/vm/service.yaml
 apiVersion: v1
 kind : Service
 metadata:
