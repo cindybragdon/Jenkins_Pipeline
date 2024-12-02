@@ -56,8 +56,8 @@ pipeline {
                     env.IMAGE = "${env.IP_IMAGE}/${GROUP_ID}/${NAME}/${VERSION}"
                 }
                 sh """
-                    envsubst < config/deployment_modif.yml > config/deploy/deployment.yml
-                    envsubst < config/service_modif.yml > config/deploy/service.yml
+                    envsubst < config/deployment_modif.yml > config/deploy/deployment.yaml
+                    envsubst < config/service_modif.yml > config/deploy/service.yaml
                 """
             }
         }
