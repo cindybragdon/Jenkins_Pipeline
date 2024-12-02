@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 
 import edu.mv.mv.db.models.Rocket;
 
-@Service
+
 public interface RocketRepository extends CrudRepository<Rocket, Integer> {
 
 

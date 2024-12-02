@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 
 @Table(name = "rocket")
 @Entity
@@ -14,6 +15,7 @@ import lombok.AllArgsConstructor;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode
 public class Rocket {
 
     @Id
@@ -21,4 +23,8 @@ public class Rocket {
     private String name;
     private String sorte;
 
+    @Override
+    public String toString() {
+        return "Rocket{id=" + id + ", name='" + name + "', sorte='" + sorte + "'}";
+    }
 }
