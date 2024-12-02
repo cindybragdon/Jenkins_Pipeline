@@ -11,6 +11,7 @@ pipeline {
     environment {
         IMAGE = readMavenPom().getArtifactId()
         VERSION = readMavenPom().getVersion()
+        GROUP_ID = readMavenPom().getGroupId()
         NAMESPACE = "eq19"
         ENV_KUBE = "${params.DEPLOY_SERVER}"
         NEXUS_PASSWORD = credentials('DEPLOY_USER_PASSWORD')
