@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cls515-labmaven-eq19
+  namespace: eq19
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cls515-labmaven-eq19
+  template:
+    metadata:
+      labels:
+        app: cls515-labmaven-eq19
+    spec:
+      containers:
+        - name: cls515-labmaven-eq19
+          image:  10.10.0.30:8082/edu.mv/cls515-labmaven-eq19:1.0.14
+          ports:
+            - containerPort: 8080
+      imagePullSecrets:
+        - name: regcred
+      restartPolicy: Always
