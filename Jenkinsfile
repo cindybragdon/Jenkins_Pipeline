@@ -71,9 +71,9 @@ pipeline {
             when { expression { params.SKIP_PUSH == "No" } }
             steps {
                 sh """
-                    docker build -t ${NEXUS_1}/edu.mv/${IMAGE}:${VERSION} .
+                    docker build -t ${NEXUS_1}/edu.mv/${APP_NAME}:${VERSION} .
                     echo ${NEXUS_PASSWORD} | docker login ${NEXUS_1} --username ${NEXUS_DOCKER_USERNAME} --password-stdin
-                    docker push ${NEXUS_1}/edu.mv/${IMAGE}:${VERSION}
+                    docker push ${NEXUS_1}/edu.mv/${APP_NAME}:${VERSION}
                 """
             }
         }
