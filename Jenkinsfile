@@ -134,46 +134,45 @@ pipeline {
         }
 
 
-        stage('Supprimer les ressources du namespace') {
-            when { expression { params.CLEAR_NAMESPACE == "Yes" } }
-            steps {
-                script {
-                    // Supprimer toutes les ressources du namespace spécifié
-                    sh """
-                        minikube kubectl delete all --all -n ${params.NAMESPACE}
-                    """
-                }
-            }
-        }
+       stage('Supprimer les ressources du namespace') {
+                   when { expression { params.CLEAR_NAMESPACE == "Yes" } }
+                   steps {
+                       script {
+                           // Supprimer toutes les ressources du namespace spécifié
+                           sh """
+                               minikube kubectl -- delete all --all -n ${params.NAMESPACE}
+                           """
+                       }
+                   }
+               }
 
-        stage('Supprimer les dépendances du namespace') {
-        when { expression { params.CLEAR_NAMESPACE == "Yes" } }
-            steps {
-                script {
-                    // Supprimer les dépendances liées à ce namespace
-                    sh """
-                       minikube kubectl delete pvc --all -n ${params.NAMESPACE}
-                       minikube kubectl delete secret --all -n ${params.NAMESPACE}
-                       minikube kubectl delete configmap --all -n ${params.NAMESPACE}
-                       minikube kubectl delete service --all -n ${params.NAMESPACE}
-                       minikube kubectl delete deployment --all -n ${params.NAMESPACE}
-                       minikube kubectl delete pod --all -n ${params.NAMESPACE}
-                       minikube kubectl delete statefulset --all -n ${params.NAMESPACE}
-                    """
-                }
-            }
-        }
+       stage('Supprimer les dépendances du namespace') {
+           when { expression { params.CLEAR_NAMESPACE == "Yes" } }
+           steps {
+               script {
+                   // Supprimer les dépendances liées à ce namespace
+                   sh """
+                      minikube kubectl -- delete pvc --all -n ${params.NAMESPACE}
+                      minikube kubectl -- delete secret --all -n ${params.NAMESPACE}
+                      minikube kubectl -- delete configmap --all -n ${params.NAMESPACE}
+                      minikube kubectl -- delete service --all -n ${params.NAMESPACE}
+                      minikube kubectl -- delete deployment --all -n ${params.NAMESPACE}
+                      minikube kubectl -- delete pod --all -n ${params.NAMESPACE}
+                      minikube kubectl -- delete statefulset --all -n ${params.NAMESPACE}
+                   """
+               }
+           }
+       }
 
-        stage('Supprimer le namespace') {
-        when { expression { params.CLEAR_NAMESPACE == "Yes" } }
-            steps {
-                script {
-                    // Supprimer le namespace complet si nécessaire
-                    sh """
-                        minikube kubectl delete namespace ${params.NAMESPACE}
-                    """
-                }
-            }
-        }
-    }
+       stage('Supprimer le namespace') {
+           when { expression { params.CLEAR_NAMESPACE == "Yes" } }
+           steps {
+               script {
+                   // Supprimer le namespace complet si nécessaire
+                   sh """
+                       minikube kubectl -- delete namespace ${params.NAMESPACE}
+                   """
+               }
+           }
+       }
 }
