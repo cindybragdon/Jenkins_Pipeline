@@ -53,7 +53,7 @@ pipeline {
                     } else if (params.DEPLOY_SERVER == 'vm') {
                         env.IP_IMAGE = '192.168.107.135:8082'
                     }
-                    env.IMAGE = "${env.IP_IMAGE}/${GROUP_ID}/${NAME}/${VERSION}"
+                    env.IMAGE = "${env.IP_IMAGE}/${GROUP_ID}/${APP_NAME}/${VERSION}"
                 }
                 sh """
                     envsubst < config/deployment_modif.yaml > config/deploy/deployment.yaml
