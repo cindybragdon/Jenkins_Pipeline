@@ -9,7 +9,7 @@ pipeline {
     }
 
     environment {
-        IMAGE = readMavenPom().getArtifactId()
+        NAME = readMavenPom().getArtifactId()
         VERSION = readMavenPom().getVersion()
         GROUP_ID = readMavenPom().getGroupId()
         NAMESPACE = "eq19"
