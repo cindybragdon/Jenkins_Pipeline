@@ -33,6 +33,40 @@ pipeline {
             }
         }
 
+        stage('test') {
+           when{
+                expression {
+                    params.SKIP_PUSH == "No"
+                }
+           }
+           steps {
+                sh 'mvn test'
+           }
+        }
+
+        stage('JaCoCo Report') {
+            when{
+                 expression {
+                    params.SKIP_PUSH == "No"
+                 }
+            }
+            steps {
+                jacoco(
+                    execPattern: '**/target/**.exec',
+                    classPattern: '**/target/classes',
+                    sourcePattern: '**/src',
+                    inclusionPattern:'**/*.class',
+                    changeBuildStatus:true,
+                    minimumInstructionCoverage:'60'
+                )
+            }
+        }
+
+
+
+
+
+
         stage('Build et push Docker') {
             when { expression { params.SKIP_PUSH == "No" } }
             steps {
