@@ -132,50 +132,48 @@ pipeline {
                 }
             }
         }
+
+
+        stage('Supprimer les ressources du namespace') {
+            when { expression { params.CLEAR_NAMESPACE == "Yes" } }
+            steps {
+                script {
+                    // Supprimer toutes les ressources du namespace spécifié
+                    sh """
+                        kubectl delete all --all -n ${params.NAMESPACE}
+                    """
+                }
+            }
+        }
+
+        stage('Supprimer les dépendances du namespace') {
+        when { expression { params.CLEAR_NAMESPACE == "Yes" } }
+            steps {
+                script {
+                    // Supprimer les dépendances liées à ce namespace
+                    sh """
+                        kubectl delete pvc --all -n ${params.NAMESPACE}
+                        kubectl delete secret --all -n ${params.NAMESPACE}
+                        kubectl delete configmap --all -n ${params.NAMESPACE}
+                        kubectl delete service --all -n ${params.NAMESPACE}
+                        kubectl delete deployment --all -n ${params.NAMESPACE}
+                        kubectl delete pod --all -n ${params.NAMESPACE}
+                        kubectl delete statefulset --all -n ${params.NAMESPACE}
+                    """
+                }
+            }
+        }
+
+        stage('Supprimer le namespace') {
+        when { expression { params.CLEAR_NAMESPACE == "Yes" } }
+            steps {
+                script {
+                    // Supprimer le namespace complet si nécessaire
+                    sh """
+                        kubectl delete namespace ${params.NAMESPACE}
+                    """
+                }
+            }
+        }
     }
-
-            stage('Supprimer les ressources du namespace') {
-                when { expression { params.CLEAR_NAMESPACE == "Yes" } }
-                steps {
-                    script {
-                        // Supprimer toutes les ressources du namespace spécifié
-                        sh """
-                            kubectl delete all --all -n ${params.NAMESPACE}
-                        """
-                    }
-                }
-            }
-
-            stage('Supprimer les dépendances du namespace') {
-            when { expression { params.CLEAR_NAMESPACE == "Yes" } }
-                steps {
-                    script {
-                        // Supprimer les dépendances liées à ce namespace
-                        sh """
-                            kubectl delete pvc --all -n ${params.NAMESPACE}
-                            kubectl delete secret --all -n ${params.NAMESPACE}
-                            kubectl delete configmap --all -n ${params.NAMESPACE}
-                            kubectl delete service --all -n ${params.NAMESPACE}
-                            kubectl delete deployment --all -n ${params.NAMESPACE}
-                            kubectl delete pod --all -n ${params.NAMESPACE}
-                            kubectl delete statefulset --all -n ${params.NAMESPACE}
-                        """
-                    }
-                }
-            }
-
-            stage('Supprimer le namespace') {
-            when { expression { params.CLEAR_NAMESPACE == "Yes" } }
-                steps {
-                    script {
-                        // Supprimer le namespace complet si nécessaire
-                        sh """
-                            kubectl delete namespace ${params.NAMESPACE}
-                        """
-                    }
-                }
-            }
-
-
-
 }
