@@ -136,7 +136,7 @@ pipeline {
                     } else if (params.DEPLOY_SERVER == 'vm') {
                         env.IP_IMAGE = '192.168.107.135:8082'
                     }
-                    env.IMAGE = "${env.IP_IMAGE}/${GROUP_ID}/${NAME}/${VERSION}"
+                    env.IMAGE = "${env.IP_IMAGE}/${GROUP_ID}/${NAME}:${VERSION}"
                 }
                 sh """
                     envsubst < config/deployment_modif.yaml > config/deploy/deployment.yaml
@@ -146,50 +146,80 @@ pipeline {
         }
 
         stage('Minikube Operations') {
-            when { expression { params.SKIP_MINIKUBE == "No" } }
-            steps {
-                sshagent(['minikube-dev-2-ssh']) {
-                    script {
+                    when { expression { params.SKIP_MINIKUBE == "No" } }
+                    steps {
+                        sshagent(['minikube-dev-2-ssh']) {
+                            script {
 
-                        sh """
-                            [ -d ~/.ssh ] || mkdir ~/.ssh && chmod 0700 ~/.ssh
-                            ssh-keyscan -t rsa,dsa ${MINIKUBE} >> ~/.ssh/known_hosts
-                        """
-
-
-                        if (params.CREATE_NAMESPACE == "Yes") {
-                            sh """
-                                ssh ${USER_KUBE_1}@${MINIKUBE} "minikube kubectl -- create namespace ${NAMESPACE}"
-                            """
-                        }
+                                sh """
+                                    [ -d ~/.ssh ] || mkdir ~/.ssh && chmod 0700 ~/.ssh
+                                    ssh-keyscan -t rsa,dsa ${MINIKUBE} >> ~/.ssh/known_hosts
+                                """
 
 
-                        if (params.CREATE_SECRET == "Yes") {
-                            sh """
-                                ssh ${USER_KUBE_1}@${MINIKUBE} "minikube kubectl -- create secret docker-registry regcred --docker-server=${MINIKUBE}:8082 --docker-username=deploy-user --docker-password=Pass123! --docker-email=de@deploy.com --namespace=${NAMESPACE}"
-                            """
-                        }
+                                if (params.CREATE_NAMESPACE == "Yes") {
+                                    sh """
+                                        ssh ${USER_KUBE_1}@${MINIKUBE} "minikube kubectl -- create namespace ${NAMESPACE}"
+                                    """
+                                }
 
 
-                        sh """
-                              ssh ${USER_KUBE_1}@${MINIKUBE} "rm -rf ${NAMESPACE}"
-                              ssh ${USER_KUBE_1}@${MINIKUBE} "mkdir ${NAMESPACE}"
-                              scp -r config/deploy ${MINIKUBE}:/home/${USER_KUBE_1}/${NAMESPACE}
-                              ssh ${USER_KUBE_1}@${MINIKUBE} "cd ${NAMESPACE} && cd deploy && minikube kubectl -- apply -f . --namespace=${NAMESPACE}"
-                        """
+                                if (params.CREATE_SECRET == "Yes") {
+                                    sh """
+                                        ssh ${USER_KUBE_1}@${MINIKUBE} "minikube kubectl -- create secret docker-registry regcred --docker-server=${MINIKUBE}:8082 --docker-username=deploy-user --docker-password=Pass123! --docker-email=de@deploy.com --namespace=${NAMESPACE}"
+                                    """
+                                }
 
 
-                        if (params.CLEAR_NAMESPACE == "Yes") {
-                            sh """
-                                ssh ${USER_KUBE_1}@${MINIKUBE} "minikube kubectl -- delete all --all -n ${NAMESPACE}"
-                                ssh ${USER_KUBE_1}@${MINIKUBE} "minikube kubectl -- delete pvc,secret,configmap,service,deployment,pod,statefulset --all -n ${NAMESPACE}"
-                                ssh ${USER_KUBE_1}@${MINIKUBE} "minikube kubectl -- delete namespace ${NAMESPACE}"
-                            """
+                                sh """
+                                      ssh ${USER_KUBE_1}@${MINIKUBE} "rm -rf ${NAMESPACE}"
+                                      ssh ${USER_KUBE_1}@${MINIKUBE} "mkdir ${NAMESPACE}"
+                                      scp -r config/deploy ${MINIKUBE}:/home/${USER_KUBE_1}/${NAMESPACE}
+                                      ssh ${USER_KUBE_1}@${MINIKUBE} "cd ${NAMESPACE} && cd deploy && cat deployment.yml && minikube kubectl -- apply -f . --namespace=${NAMESPACE} && cat hpa.yml && minikube kubectl -- get hpa -n ${NAMESPACE}"
+                                      ssh ${USER_KUBE_1}@${MINIKUBE} "minikube service list"
+                                      ssh ${USER_KUBE_1}@${MINIKUBE} "minikube kubectl -- get pods -n ${NAMESPACE}"
+                                      ssh ${USER_KUBE_1}@${MINIKUBE} "minikube kubectl -- get pods -A"
+                                      ssh ${USER_KUBE_1}@${MINIKUBE} "minikube kubectl -- get services -n ${NAMESPACE}"
+
+                                """
+
+
+                                if (params.CLEAR_NAMESPACE == "Yes") {
+                                    sh """
+                                        ssh ${USER_KUBE_1}@${MINIKUBE} "minikube kubectl -- delete all --all -n ${NAMESPACE}"
+                                        ssh ${USER_KUBE_1}@${MINIKUBE} "minikube kubectl -- delete pvc,secret,configmap,service,deployment,pod,statefulset --all -n ${NAMESPACE}"
+                                        ssh ${USER_KUBE_1}@${MINIKUBE} "minikube kubectl -- delete namespace ${NAMESPACE}"
+                                    """
+                                }
+
+                                def serviceUrl = sh(script: """
+                                    ssh ${USER_KUBE_1}@${MINIKUBE} "minikube service ${NAME} -n ${NAMESPACE} --url"
+                                """, returnStdout: true).trim()
+                                echo "Service accessible at: ${serviceUrl}"
+
+                                def createRocket = sh(script: """
+                                    ssh ${USER_KUBE_1}@${MINIKUBE} "curl -X POST ${serviceUrl}/rocket -H 'Content-Type: application/json' -d '{\\\"id\\\":1,\\\"name\\\": \\\"Interstellar\\\", \\\"type\\\": \\\"sinucoïdal\\\"}'"
+                                """, returnStatus: true)
+                                if (createRocket != 0) {
+                                    error("Failed to create a rocket")
+                                } else {
+                                    echo "Fusée en lancement!!!"
+                                }
+
+                                def getRocket = sh(script: """
+                                    ssh ${USER_KUBE_1}@${MINIKUBE} "curl -X GET ${serviceUrl}/rocket/1"
+                                """, returnStatus: true)
+                                if (getRocket != 0) {
+                                    error("Failed to retrieve rockets")
+                                } else {
+                                    echo "SUCCES !!! GET rocket a fonctionné pppppiiiiissshhhh"
+                                }
+
+
+                            }
                         }
                     }
                 }
-            }
-        }
         stage('Insectes et Bugs') {
                     steps {
 
