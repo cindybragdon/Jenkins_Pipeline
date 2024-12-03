@@ -167,7 +167,7 @@ pipeline {
         }
         stage('Insectes et Bugs') {
                     steps {
-                        ansiColor('xterm') { // Active le support pour la couleur et le formatage
+
                             script {
                                 echo "🐜 Exploration des fourmis..."
                                 sleep(2)
@@ -187,6 +187,6 @@ pipeline {
                             }
                         }
                     }
-                }
+
     }
 }
