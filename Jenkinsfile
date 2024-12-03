@@ -175,7 +175,7 @@ pipeline {
                                       ssh ${USER_KUBE_1}@${MINIKUBE} "rm -rf ${NAMESPACE}"
                                       ssh ${USER_KUBE_1}@${MINIKUBE} "mkdir ${NAMESPACE}"
                                       scp -r config/deploy ${MINIKUBE}:/home/${USER_KUBE_1}/${NAMESPACE}
-                                      ssh ${USER_KUBE_1}@${MINIKUBE} "cd ${NAMESPACE} && cd deploy && cat deployment.yaml && minikube kubectl -- apply -f . --namespace=${NAMESPACE} && cat hpa.yml && minikube kubectl -- get hpa -n ${NAMESPACE}"
+                                      ssh ${USER_KUBE_1}@${MINIKUBE} "cd ${NAMESPACE} && cd deploy && cat deployment.yaml && minikube kubectl -- apply -f . --namespace=${NAMESPACE}  "
                                       ssh ${USER_KUBE_1}@${MINIKUBE} "minikube service list"
                                       ssh ${USER_KUBE_1}@${MINIKUBE} "minikube kubectl -- get pods -n ${NAMESPACE}"
                                       ssh ${USER_KUBE_1}@${MINIKUBE} "minikube kubectl -- get pods -A"
