@@ -6,7 +6,7 @@ metadata:
 spec:
   type: NodePort
   selector:
-    app: ${APP_NAME}
+    app: ${NAME}
   ports:
     - protocol: TCP
       port: 8080
