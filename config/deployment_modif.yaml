@@ -14,7 +14,7 @@ spec:
         app: ${NAME}
     spec:
       containers:
-        - name: ${APP_NAME}
+        - name: ${NAME}
           image: ${IMAGE}
           ports:
             - containerPort: 8080
