@@ -1,6 +1,7 @@
 pipeline {
     agent {
         label 'JavaAgent'
+<<<<<<< HEAD
     }
 
     parameters {
@@ -12,15 +13,36 @@ pipeline {
          choice(name:"SKIP_MINIKUBE", choices:["No","Yes"], description:"Skip Minikube")
          choice(name:"CLEAR_NAMESPACE", choices:["No","Yes"], description:"CLEAR NAMESPACE")
     }
+=======
+    }
+
+    parameters {
+         choice(name:"DEPLOY_SERVER", choices:["vm", "dev"], description:"Choix de l'environement")
+         choice(name:"MINIKUBE", choices:["10.10.0.41", "10.10.0.42","10.10.0.43"], description:"Minikube de déploiement")
+         choice(name:"CREATE_NAMESPACE", choices:["No","Yes"], description:"Creating the namespace")
+         choice(name:"CREATE_SECRET", choices:["No","Yes"], description:"Creating the secret")
+         choice(name:"SKIP_PUSH", choices:["Yes","No"], description:"Skip push")
+         choice(name:"SKIP_MINIKUBE", choices:["No","Yes"], description:"Skip Minikube")
+         choice(name:"CLEAR_NAMESPACE", choices:["No","Yes"], description:"CLEAR NAMESPACE")
+    }
+>>>>>>> 4766fe30fddcfd82995d63b8fa22d28703d1ab6e
     environment {
         NAME = readMavenPom().getArtifactId()
         VERSION = readMavenPom().getVersion()
         GROUP_ID = readMavenPom().getGroupId()
+<<<<<<< HEAD
         NAMESPACE = "eq19"
         IP_NEXUS_VM = "192.168.5.129"
 
         NEXUS_PASSWORD = credentials('DEPLOY_USER_PASSWORD')
         NVD_API_KEY = credentials('NVD-API-KEY')
+=======
+        NAMESPACE = "eq8"
+        IP_NEXUS_VM = "192.168.5.129"
+
+        NEXUS_PASSWORD = credentials('DEPLOY_USER_PASSWORD')
+
+>>>>>>> 4766fe30fddcfd82995d63b8fa22d28703d1ab6e
     }
     stages {
 
@@ -72,7 +94,10 @@ pipeline {
                 )
             }
         }
+<<<<<<< HEAD
 
+=======
+>>>>>>> 4766fe30fddcfd82995d63b8fa22d28703d1ab6e
         stage('docker build') {
             when{
                 expression {
@@ -95,6 +120,7 @@ pipeline {
                 echo "Publication de Image sur Nexus ${NEXUS_1}"
                 sh "echo ${NEXUS_PASSWORD} | docker login ${NEXUS_1} --username ${NEXUS_DOCKER_USERNAME} --password-stdin"
                 sh "docker push ${NEXUS_1}/${GROUP_ID}/${NAME}:${VERSION}"
+<<<<<<< HEAD
             }
         }
 
@@ -119,6 +145,8 @@ pipeline {
                 dependencyCheckPublisher(
                     pattern: '**/dependency-check-report.xml'
                 )
+=======
+>>>>>>> 4766fe30fddcfd82995d63b8fa22d28703d1ab6e
             }
         }
 
@@ -136,16 +164,21 @@ pipeline {
                     } else if (params.DEPLOY_SERVER == 'vm') {
                         env.IP_IMAGE = '192.168.107.135:8082'
                     }
+<<<<<<< HEAD
                     env.IMAGE = "${env.IP_IMAGE}/${GROUP_ID}/${NAME}:${VERSION}"
+=======
+                    env.IMAGE = "${env.IP_IMAGE}/${GROUP_ID}/${NAME}/${VERSION}"
+>>>>>>> 4766fe30fddcfd82995d63b8fa22d28703d1ab6e
                 }
                 sh """
-                    envsubst < config/deployment_modif.yaml > config/deploy/deployment.yaml
-                    envsubst < config/service_modif.yaml > config/deploy/service.yaml
+                    envsubst < config/deployment_modif.yml > config/deploy/deployment.yml
+                    envsubst < config/service_modif.yml > config/deploy/service.yml
                 """
             }
         }
 
         stage('Minikube Operations') {
+<<<<<<< HEAD
                     when { expression { params.SKIP_MINIKUBE == "No" } }
                     steps {
                         sshagent(['minikube-dev-2-ssh']) {
@@ -241,5 +274,51 @@ pipeline {
                         }
                     }
 
+=======
+            when { expression { params.SKIP_MINIKUBE == "No" } }
+            steps {
+                sshagent(['minikube-dev-2-ssh']) {
+                    script {
+
+                        sh """
+                            [ -d ~/.ssh ] || mkdir ~/.ssh && chmod 0700 ~/.ssh
+                            ssh-keyscan -t rsa,dsa ${MINIKUBE} >> ~/.ssh/known_hosts
+                        """
+
+
+                        if (params.CREATE_NAMESPACE == "Yes") {
+                            sh """
+                                ssh ${USER_KUBE_1}@${MINIKUBE} "minikube kubectl -- create namespace ${NAMESPACE}"
+                            """
+                        }
+
+
+                        if (params.CREATE_SECRET == "Yes") {
+                            sh """
+                                ssh ${USER_KUBE_1}@${MINIKUBE} "minikube kubectl -- create secret docker-registry regcred --docker-server=${MINIKUBE}:8082 --docker-username=deploy-user --docker-password=Pass123! --docker-email=de@deploy.com --namespace=${NAMESPACE}"
+                            """
+                        }
+
+
+                        sh """
+                              ssh ${USER_KUBE_1}@${MINIKUBE} "rm -rf ${NAMESPACE}"
+                              ssh ${USER_KUBE_1}@${MINIKUBE} "mkdir ${NAMESPACE}"
+                              scp -r config/deploy ${MINIKUBE}:/home/${USER_KUBE_1}/${NAMESPACE}
+                              ssh ${USER_KUBE_1}@${MINIKUBE} "cd ${NAMESPACE} && cd deploy && minikube kubectl -- apply -f . --namespace=${NAMESPACE}"
+                        """
+
+
+                        if (params.CLEAR_NAMESPACE == "Yes") {
+                            sh """
+                                ssh ${USER_KUBE_1}@${MINIKUBE} "minikube kubectl -- delete all --all -n ${NAMESPACE}"
+                                ssh ${USER_KUBE_1}@${MINIKUBE} "minikube kubectl -- delete pvc,secret,configmap,service,deployment,pod,statefulset --all -n ${NAMESPACE}"
+                                ssh ${USER_KUBE_1}@${MINIKUBE} "minikube kubectl -- delete namespace ${NAMESPACE}"
+                            """
+                        }
+                    }
+                }
+            }
+        }
+>>>>>>> 4766fe30fddcfd82995d63b8fa22d28703d1ab6e
     }
 }
