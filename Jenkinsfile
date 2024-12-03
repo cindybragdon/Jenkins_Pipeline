@@ -170,20 +170,18 @@ pipeline {
 
                             script {
                                 echo "🐜 Exploration des fourmis..."
-                                sleep(2)
-                                echo "🦗 Les criquets sautent dans la file..."
-                                sleep(2)
-                                echo "🐞 Une coccinelle élégante passe devant."
-                                sleep(2)
-                                echo "🐝 Une abeille bourdonnante rejoint la fête."
-                                sleep(2)
-                                echo "🕷️ Une araignée tisse une file d'attente spéciale."
-                                sleep(2)
-                                echo "🪲 Un scarabée scintillant arrive en dernier."
-                                sleep(2)
 
-                                // Affiche la phrase en gras et en plus grand
-                                echo "\033[1;34m\033[4m\033[5m Avec Jenkins, même les bugs font la queue ! 🐛🐜🦋🪲🐝 \033[0m"
+                                echo "🦗 Les criquets sautent dans la file..."
+
+                                echo "🐞 Une coccinelle élégante passe devant."
+
+                                echo "🐝 Une abeille bourdonnante rejoint la fête."
+
+                                echo "🕷️ Une araignée tisse une file d'attente spéciale."
+
+                                echo "🪲 Un scarabée scintillant arrive en dernier."
+
+                                echo "Avec Jenkins, même les bugs font la queue ! 🐛🐜🦋🪲🐝 "
                             }
                         }
                     }
