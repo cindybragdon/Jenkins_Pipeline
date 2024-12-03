@@ -16,7 +16,7 @@ pipeline {
         NAME = readMavenPom().getArtifactId()
         VERSION = readMavenPom().getVersion()
         GROUP_ID = readMavenPom().getGroupId()
-        NAMESPACE = "eq8"
+        NAMESPACE = "eq19"
         IP_NEXUS_VM = "192.168.5.129"
 
         NEXUS_PASSWORD = credentials('DEPLOY_USER_PASSWORD')
