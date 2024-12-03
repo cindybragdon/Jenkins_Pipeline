@@ -20,7 +20,7 @@ pipeline {
         IP_NEXUS_VM = "192.168.5.129"
 
         NEXUS_PASSWORD = credentials('DEPLOY_USER_PASSWORD')
-
+        NVD_API_KEY = credentials('NVD-API-KEY')
     }
     stages {
 
@@ -72,6 +72,7 @@ pipeline {
                 )
             }
         }
+
         stage('docker build') {
             when{
                 expression {
@@ -94,6 +95,30 @@ pipeline {
                 echo "Publication de Image sur Nexus ${NEXUS_1}"
                 sh "echo ${NEXUS_PASSWORD} | docker login ${NEXUS_1} --username ${NEXUS_DOCKER_USERNAME} --password-stdin"
                 sh "docker push ${NEXUS_1}/${GROUP_ID}/${NAME}:${VERSION}"
+            }
+        }
+
+        stage('OWASP Dependency-Check Vulnerabilities') {
+            when {
+                expression {
+                    params.SKIP_PUSH == "No"
+                }
+            }
+            steps {
+                script {
+
+                    dependencyCheck additionalArguments: """
+                        --nvdApiKey ${NVD_API_KEY}
+                        --nvdApiDelay 16000
+                        --scan .
+                        --format ALL
+                        --out .
+                    """, odcInstallation: 'DP-Check'
+                }
+
+                dependencyCheckPublisher(
+                    pattern: '**/dependency-check-report.xml'
+                )
             }
         }
 
